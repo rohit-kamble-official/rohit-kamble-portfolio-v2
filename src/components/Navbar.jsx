@@ -67,7 +67,7 @@ export default function Navbar() {
 
         {/* CTA */}
         <a
-          href="https://rohit-kamble-official.github.io/portfolio/Images/Rohit%20Kamble%20(CV)[1].pdf"
+          href="/Rohit_Kamble_Resume.pdf"
           target="_blank"
           rel="noreferrer"
           className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 shadow-lg shadow-violet-900/30"
