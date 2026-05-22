@@ -21,9 +21,9 @@ export const personalInfo = {
 
 export const stats = [
   { label: 'Internships', value: 4, suffix: '' },
-  { label: 'Projects Built', value: 5, suffix: '+' },
+  { label: 'Projects Built', value: 20 , suffix: '+' },
   { label: 'Certifications', value: 8, suffix: '' },
-  { label: 'Hackathon Wins', value: 3, suffix: '' },
+  { label: 'Hackathon Wins', value: 5, suffix: '' },
 ]
 
 export const quickFacts = [
