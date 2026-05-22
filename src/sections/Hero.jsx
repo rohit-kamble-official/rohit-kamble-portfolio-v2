@@ -113,15 +113,15 @@ export default function Hero() {
           className="flex flex-wrap items-center justify-center gap-4 mb-8"
           style={{ animation: 'fadeUp 0.8s 0.3s ease both', opacity: 0, animationFillMode: 'forwards' }}
         >
-          <a
-            href={personalInfo.resumeUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-violet-900/40"
-          >
-            <DownloadIcon />
-            Download Resume
-          </a>
+         <a
+  href="/Rohit_Kamble_Resume.pdf"
+  target="_blank"
+  rel="noreferrer"
+  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm"
+>
+  <DownloadIcon />
+  Download Resume
+</a>
           <a
             href="#projects"
             onClick={e => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}
