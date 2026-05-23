@@ -64,7 +64,7 @@ export default function About() {
               }}
             >
               <img
-                src="https://rohit-kamble-official.github.io/portfolio/Images/Rohit.jpg"
+                src="/Rohit_Kamble_img.png"
                 alt="Rohit Kamble — Full Stack Developer Nagpur"
                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                 onError={e => {

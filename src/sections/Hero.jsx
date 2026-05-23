@@ -96,16 +96,15 @@ function ProfileImage() {
         }}
       >
         {/* Real profile image */}
-        <img
-          src="https://rohit-kamble-official.github.io/portfolio/Images/Rohit.jpg"
-          alt="Rohit Kamble — Full Stack Developer"
-          className="w-full h-full object-cover object-top"
-          onError={(e) => {
-            // Fallback: beautiful initials avatar
-            e.target.style.display = 'none'
-            e.target.nextSibling.style.display = 'flex'
-          }}
-        />
+       <img
+  src="/Rohit_Kamble_img.png"
+  alt="Rohit Kamble — Full Stack Developer"
+  className="w-full h-full object-cover object-top"
+  onError={(e) => {
+    e.target.style.display = 'none'
+    e.target.nextSibling.style.display = 'flex'
+  }}
+/>
         {/* Fallback avatar */}
         <div
           className="w-full h-full items-center justify-center"
@@ -239,7 +238,7 @@ export default function Hero() {
             style={{ animation: 'fadeUp 0.8s 0.28s ease both', opacity: 0, animationFillMode: 'forwards' }}
           >
             <a
-              href={personalInfo.resumeUrl}
+              href={"/Rohit_Kamble_Resume.pdf"}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-violet-900/40"

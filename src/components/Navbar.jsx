@@ -109,7 +109,7 @@ export default function Navbar() {
             </button>
           ))}
           <a
-            href="https://rohit-kamble-official.github.io/portfolio/Images/Rohit%20Kamble%20(CV)[1].pdf"
+            href="/Rohit_Kamble_Resume.pdf"
             target="_blank"
             rel="noreferrer"
             className="mt-3 text-center py-3 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold"
