@@ -186,7 +186,3 @@ All content lives in **`src/utils/data.js`** — just edit that file!
 ## 📄 License
 
 MIT — Built with ❤️ for Rohit Kamble's portfolio.
-
----
-
-> **Pro tip:** After deployment, submit to [Awwwards](https://www.awwwards.com) and [CSS Design Awards](https://www.cssdesignawards.com/) for recognition!
