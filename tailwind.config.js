@@ -5,7 +5,8 @@ export default {
     extend: {
       fontFamily: {
         syne: ['Syne', 'sans-serif'],
-        grotesk: ['Space Grotesk', 'sans-serif'],
+        grotesk: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
