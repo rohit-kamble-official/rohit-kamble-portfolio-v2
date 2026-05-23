@@ -21,9 +21,9 @@ export const personalInfo = {
 
 export const stats = [
   { label: 'Internships', value: 4, suffix: '' },
-  { label: 'Projects Built', value: 20 , suffix: '+' },
+  { label: 'Projects Built', value: 5, suffix: '+' },
   { label: 'Certifications', value: 8, suffix: '' },
-  { label: 'Hackathon Wins', value: 5, suffix: '' },
+  { label: 'Hackathon Wins', value: 3, suffix: '' },
 ]
 
 export const quickFacts = [
@@ -62,16 +62,16 @@ export const skills = [
     chips: ['Scikit-learn', 'TensorFlow.js', 'NumPy', 'Pandas', 'Matplotlib', 'Seaborn', 'OpenCV'],
   },
   {
-    category: 'Deployment',
-    icon: '☁️',
+    category: 'DevOps & Cloud',
+    icon: '🐳',
     color: 'green',
-    chips: ['GitHub Pages', 'Vercel', 'Netlify', 'Vite', 'Android SDK'],
+    chips: ['Docker', 'CI/CD Pipelines', 'AWS (EC2, S3)', 'GitHub Actions', 'Vercel', 'Netlify', 'GitHub Pages'],
   },
   {
-    category: 'IoT & Emerging',
-    icon: '📡',
+    category: 'Mobile & IoT',
+    icon: '📱',
     color: 'purple',
-    chips: ['IoT Integration', 'Speech Recognition', 'Gesture Detection', 'React Native', 'Mobile Dev'],
+    chips: ['React Native', 'Android Dev (SDK)', 'IoT Integration', 'OpenCV', 'Speech Recognition', 'Gesture Detection'],
   },
 ]
 
@@ -255,38 +255,44 @@ export const services = [
   {
     icon: '🌐',
     title: 'Full Stack Development',
-    desc: 'End-to-end MERN stack applications — from database design to polished, responsive frontends.',
+    desc: 'End-to-end MERN stack applications — from database design to polished, production-ready frontends with REST APIs.',
     color: 'purple',
+    tags: ['React.js', 'Node.js', 'MongoDB', 'Express', 'REST API'],
+  },
+  {
+    icon: '🐳',
+    title: 'Docker & CI/CD Pipelines',
+    desc: 'Containerize your app with Docker, automate builds & deployments with GitHub Actions CI/CD — ship faster with zero downtime.',
+    color: 'green',
+    tags: ['Docker', 'GitHub Actions', 'CI/CD', 'AWS EC2', 'Auto Deploy'],
+  },
+  {
+    icon: '☁️',
+    title: 'AWS Cloud Deployment',
+    desc: 'Deploy scalable apps on AWS — EC2 instances, S3 storage, and cloud architecture for production-grade performance.',
+    color: 'cyan',
+    tags: ['AWS EC2', 'AWS S3', 'Cloud', 'Scalable', 'Production'],
   },
   {
     icon: '🤖',
     title: 'AI / ML Solutions',
-    desc: 'Machine learning models, data pipelines, and AI-powered features integrated into your product.',
-    color: 'cyan',
+    desc: 'ML models, data pipelines, and AI-powered features — from prediction systems to real-time emotion detection.',
+    color: 'pink',
+    tags: ['Python', 'Scikit-learn', 'TensorFlow.js', 'OpenCV', 'Pandas'],
   },
   {
     icon: '📱',
     title: 'Mobile Development',
-    desc: 'Cross-platform React Native apps that deliver native performance on iOS and Android.',
-    color: 'pink',
+    desc: 'Cross-platform React Native apps that deliver native performance on iOS and Android with polished UX.',
+    color: 'purple',
+    tags: ['React Native', 'Android', 'iOS', 'Cross-Platform'],
   },
   {
     icon: '🎨',
     title: 'Portfolio & UI Design',
-    desc: 'Premium portfolio websites and UI components built with modern design principles.',
+    desc: 'Premium portfolio websites and UI components with futuristic design — Awwwards-quality, fully responsive.',
     color: 'gold',
-  },
-  {
-    icon: '☁️',
-    title: 'Deployment & DevOps',
-    desc: 'Production-ready deployment on Vercel, Netlify, or GitHub Pages with CI/CD setup.',
-    color: 'green',
-  },
-  {
-    icon: '📊',
-    title: 'Data Analytics',
-    desc: 'Actionable insights from raw data using SQL, Tableau, Pandas, and visualization tools.',
-    color: 'purple',
+    tags: ['React', 'Tailwind CSS', 'Framer Motion', 'Responsive'],
   },
 ]
 
@@ -301,7 +307,7 @@ export const navLinks = [
 
 export const techStack = [
   'React.js', 'Node.js', 'MongoDB', 'Python',
-  'Machine Learning', 'React Native', 'Java', 'SQL', 'MERN Stack',
+  'Machine Learning', 'React Native', 'Docker', 'AWS', 'CI/CD', 'Java', 'MERN Stack',
 ]
 
 export const typedRoles = [
