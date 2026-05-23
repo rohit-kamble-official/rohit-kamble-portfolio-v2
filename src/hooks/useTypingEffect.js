@@ -13,7 +13,7 @@ export function useTypingEffect(words, typingSpeed = 80, deletingSpeed = 50, pau
         setDisplayText(currentWord.slice(0, displayText.length + 1))
         if (displayText === currentWord) {
           setTimeout(() => setIsDeleting(true), pauseTime)
-          return
+          return 
         }
       } else {
         setDisplayText(currentWord.slice(0, displayText.length - 1))
