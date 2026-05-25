@@ -85,7 +85,7 @@ export const projects = [
     categoryLabel: 'Full Stack',
     featured: true,
     tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'JWT', 'REST API'],
-    github: 'https://github.com/rohit-kamble-official',
+    github: 'https://github.com/rohit-kamble-official/TradeX-AI-.git',
     live: null,
     color: 'purple',
   },
