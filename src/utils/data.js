@@ -79,10 +79,10 @@ export const projects = [
   {
     id: 1,
     title: 'Full-Stack Stock Trading Platform',
-    description: 'A comprehensive MERN-stack trading platform featuring secure user authentication, live product catalog, cart management, order tracking, and payment integration. Built for scalability and production-grade reliability.',
+    description: 'TradeX AI is a full-stack AI-powered stock trading simulation platform inspired by Zerodha, featuring real-time market updates, AI trading insights, live portfolio tracking, and interactive charts using React, Node.js, MongoDB, and Socket.io.',
     emoji: '📈',
     category: 'fullstack',
-    categoryLabel: 'Full Stack',
+    categoryLabel: 'Full Stack',  
     featured: true,
     tags: ['MongoDB', 'Express.js', 'React', 'Node.js', 'JWT', 'REST API'],
     github: 'https://github.com/rohit-kamble-official/TradeX-AI-.git',
