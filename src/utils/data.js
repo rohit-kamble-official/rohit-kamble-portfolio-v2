@@ -111,7 +111,7 @@ export const projects = [
     categoryLabel: 'AI + Full Stack',
     featured: true,
     tags: ['React', 'Chakra UI', 'Node.js', 'MongoDB', 'TensorFlow.js', 'Emotion API'],
-    github: 'https://github.com/rohit-kamble-official',
+    github: 'https://github.com/rohit-kamble-official/VibeVerse-.git',
     live: 'https://rohit-kamble-official.github.io/FInal_project_Website/',
     color: 'cyan',
   },
