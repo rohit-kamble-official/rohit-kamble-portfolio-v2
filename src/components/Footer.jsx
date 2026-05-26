@@ -123,12 +123,7 @@ export default function Footer() {
             <span className="text-violet-400 font-semibold">Rohit Kamble</span>
             {' '}· Full Stack Developer · Nagpur, India · All rights reserved.
           </p>
-          <p className="text-slate-700 text-xs">
-            Built with <span className="text-red-500">❤</span> using{' '}
-            <span className="text-violet-400">React</span> ·{' '}
-            <span className="text-cyan-400">Vite</span> ·{' '}
-            <span className="text-green-400">Tailwind CSS</span>
-          </p>
+         
         </div>
       </div>
     </footer>
