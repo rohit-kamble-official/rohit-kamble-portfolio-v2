@@ -186,3 +186,4 @@ All content lives in **`src/utils/data.js`** — just edit that file!
 ## 📄 License
 
 MIT — Built with ❤️ for Rohit Kamble's portfolio.
+
