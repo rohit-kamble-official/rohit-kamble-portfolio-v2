@@ -5,12 +5,12 @@
 export const personalInfo = {
   name: 'Rohit Kamble',
   tagline: 'Full Stack Developer | AI Enthusiast | Creative Problem Solver',
-  bio: [
-    "I'm a final-year B.Tech Electrical Engineering student at S.B. Jain Institute, Nagpur — with a passion for Computer Science that transcends my core curriculum.",
-    "Despite coming from a non-CS background, I've built a solid foundation in Full-Stack Web Development, App Development, and Core CS concepts — driven entirely by curiosity and relentless self-learning.",
-    "Currently interning as a Software Development Intern at Zonovva Creative Agency, Pune, contributing to real-world projects using React, Node.js, MongoDB, SQL, and React Native.",
-    "My goal is to build impactful, scalable digital solutions that solve real-world problems. I'm actively seeking SDE roles where I can grow, contribute, and leave a mark.",
-  ],
+bio: [
+  "I'm Rohit Kamble, a B.Tech Electrical Engineering graduate with a strong passion for Software Development and Computer Science. Through continuous self-learning and hands-on experience, I've built expertise in designing modern, scalable, and user-centric applications.",
+  "My technical journey spans Full-Stack Web Development, Mobile App Development, AI-powered solutions, and backend engineering. I enjoy transforming complex problems into elegant, high-performance products using React, Node.js, Express.js, PostgreSQL, MongoDB, and modern cloud technologies.",
+  "During my Software Development Internship at Zonova Creative Agency, I contributed to production-ready applications, optimized performance, built reusable components, and collaborated with cross-functional teams following Agile development practices.",
+  "Beyond development, I'm a four-time hackathon winner, IEEE Vice-Chairperson, and a Top-6 Finalist at Hack for Impact by IIIT Delhi. I believe in building technology that creates meaningful impact, and I'm actively seeking Software Development Engineer opportunities where I can innovate, learn, and contribute to world-class products."
+],
   email: 'itsrohitrk.official@gmail.com',
   github: 'https://github.com/rohit-kamble-official',
   linkedin: 'https://www.linkedin.com/in/rohit-kamble-135575252',
@@ -76,8 +76,83 @@ export const skills = [
 ]
 
 export const projects = [
+
   {
-    id: 1,
+  id: 1,
+  title: 'WorkspaceOS — Enterprise Multi-Tenant Workspace Management SaaS',
+  description:
+    'A scalable enterprise SaaS platform for workspace management featuring multi-tenancy, role-based access control (RBAC), workspace booking, analytics dashboards, subscription management, and real-time collaboration. Designed with secure tenant isolation and high-performance backend architecture.',
+  emoji: '🏢',
+  category: 'fullstack',
+  categoryLabel: 'Full Stack SaaS',
+  featured: true,
+  tags: [
+    'React.js',
+    'Node.js',
+    'Express.js',
+    'PostgreSQL',
+    'Prisma',
+    'Redis',
+    'Socket.io',
+    'Docker',
+    'GitHub Actions'
+  ],
+  github: 'https://github.com/rohit-kamble-official',
+   live: 'https://workspace-os-eta.vercel.app/',
+  color: 'violet',
+},
+
+{
+  id: 2,
+  title: 'AI-Powered LeetCode Assistant',
+  description:
+    'An intelligent coding assistant that integrates Claude AI through the Model Context Protocol (MCP) to provide problem explanations, progressive hints, solution analysis, and time & space complexity evaluation. Built with real-time communication, JWT authentication, Redis caching, and scalable backend architecture.',
+  emoji: '🤖',
+  category: 'ai',
+  categoryLabel: 'AI Developer Tool',
+  featured: true,
+  tags: [
+    'React.js',
+    'Node.js',
+    'Express.js',
+    'PostgreSQL',
+    'Redis',
+    'Claude AI',
+    'MCP',
+    'WebSockets',
+    'JWT'
+  ],
+  github: 'https://github.com/rohit-kamble-official',
+  live: 'https://leetcode-ai-mcp-assistant.vercel.app/',
+  color: 'cyan',
+},
+
+{
+  id: 3,
+  title: "KaamSetu — India's Workforce Operating System",
+  description:
+    'A next-generation workforce platform connecting workers and employers through AI-powered job matching, multilingual voice search, GPS-based attendance, secure escrow payments, and real-time notifications. Built on an event-driven microservices architecture for scalable workforce management.',
+  emoji: '🌍',
+  category: 'fullstack',
+  categoryLabel: 'AI + Workforce Platform',
+  featured: true,
+  tags: [
+    'React Native',
+    'React.js',
+    'Node.js',
+    'FastAPI',
+    'PostgreSQL',
+    'PostGIS',
+    'Redis',
+    'Apache Kafka',
+    'Microservices'
+  ],
+  github: 'https://github.com/rohit-kamble-official/-KaamSetu-Platform.git',
+  color: 'emerald',
+},
+
+  {
+    id: 4,
     title: 'Full-Stack Stock Trading Platform',
     description: 'TradeX AI is a full-stack AI-powered stock trading simulation platform inspired by Zerodha, featuring real-time market updates, AI trading insights, live portfolio tracking, and interactive charts using React, Node.js, MongoDB, and Socket.io.',
     emoji: '📈',
@@ -90,7 +165,7 @@ export const projects = [
     color: 'purple',
   },
   {
-    id: 2,
+    id: 5,
     title: 'Heart Failure Prediction System',
     description: 'ML-based clinical decision support tool that predicts heart disease risk using patient clinical and lifestyle data. Features advanced data preprocessing, feature engineering, and model optimization for high accuracy and real-world applicability.',
     emoji: '❤️',
@@ -103,7 +178,7 @@ export const projects = [
     color: 'pink',
   },
   {
-    id: 3,
+    id: 6,
     title: 'Real-Time Mood-Based Music Player',
     description: 'Interactive music platform that detects emotions from images or text and recommends songs to match the mood. Built with modular component design for scalability, TensorFlow.js emotion detection, and smooth UX.',
     emoji: '🎵',
@@ -116,7 +191,7 @@ export const projects = [
     color: 'cyan',
   },
   {
-    id: 4,
+    id: 7,
     title: 'Substation Sentinel — Electrical Monitoring',
     description: 'Real-time substation monitoring solution leveraging IoT devices to track electrical parameters and system health. Provides instant alerts, analytics dashboard, and operational insights for safe, reliable maintenance.',
     emoji: '⚡',
@@ -129,7 +204,7 @@ export const projects = [
     color: 'gold',
   },
   {
-    id: 5,
+    id: 8,
     title: 'AI-Driven Smart Safety System for Women',
     description: "Hands-free AI safety system with gesture, voice, and shake detection for women's safety. Features real-time location tracking, threat detection, secure evidence collection, and instant alerts via SMS, WhatsApp, and email.",
     emoji: '🛡️',
@@ -141,6 +216,8 @@ export const projects = [
     live: null,
     color: 'pink',
   },
+
+
 ]
 
 export const experience = [

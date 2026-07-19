@@ -97,7 +97,7 @@ function ProfileImage() {
       >
         {/* Real profile image */}
        <img
-  src="/Rohit_Kamble_img.png"
+  src="/Rohit .png"
   alt="Rohit Kamble — Full Stack Developer"
   className="w-full h-full object-cover object-top"
   onError={(e) => {
@@ -225,11 +225,9 @@ export default function Hero() {
 
           {/* Short bio */}
           <div style={{ animation: 'fadeUp 0.8s 0.22s ease both', opacity: 0, animationFillMode: 'forwards' }}>
-            <p className="text-slate-400 text-sm leading-relaxed mb-7 max-w-md">
-              Final-year B.Tech EE student at S.B. Jain Institute, Nagpur — building production-grade
-              <span className="text-violet-300 font-medium"> MERN Stack, AI/ML, Docker & AWS</span> solutions.
-              Currently interning at <span className="text-cyan-300 font-medium">Zonovva Creative Agency</span>.
-            </p>
+     <p className="text-slate-400 text-sm leading-relaxed mb-7 max-w-md">
+  Passionate <span className="text-violet-300 font-medium">Full-Stack Software Developer</span> building scalable web applications, AI-powered solutions, and cloud-native systems. Currently a <span className="text-cyan-300 font-medium">Software Development Intern at Zonova Creative Agency</span>, <span className="text-yellow-300 font-medium">6× Hackathon Winner</span>, <span className="text-pink-300 font-medium">Top-6 Finalist at Hack for Impact (IIIT Delhi)</span>, and <span className="text-emerald-300 font-medium">IEEE Vice-Chairperson</span>.
+</p>
           </div>
 
           {/* CTA Buttons */}
