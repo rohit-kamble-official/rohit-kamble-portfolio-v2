@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Inter'; src: url(data:font/woff2;base64,__INTER__) format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: 'Mono'; src: url(data:font/woff2;base64,__MONO__) format('woff2'); font-weight: 500; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: 'Inter', sans-serif; color: #EDEEF3; background: #05060A;
+    position: relative;
+  }
+  .bg { position: absolute; inset: 0;
+    background:
+      radial-gradient(620px 420px at 8% 0%, rgba(76, 120, 255, .30), transparent 70%),
+      radial-gradient(560px 460px at 100% 100%, rgba(150, 100, 255, .30), transparent 70%),
+      #05060A; }
+  .grid { position: absolute; inset: 0; opacity: .55;
+    background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at 40% 50%, #000 30%, transparent 80%); }
+  .content { position: absolute; left: 72px; top: 70px; width: 680px; }
+  .eyebrow { font-family: 'Mono', monospace; font-size: 17px; letter-spacing: .2em; color: #8E96AA; text-transform: uppercase; display: flex; gap: 14px; align-items: center; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #3EE6A0; box-shadow: 0 0 14px #3EE6A0; }
+  h1 { font-size: 96px; font-weight: 640; letter-spacing: -0.045em; line-height: 1; margin-top: 30px; }
+  h2 { font-size: 42px; font-weight: 560; letter-spacing: -0.03em; line-height: 1.12; margin-top: 22px;
+    background: linear-gradient(90deg, #7AA2FF, #B48CFF); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .roles { margin-top: 26px; font-size: 21.5px; color: #A3A9B8; letter-spacing: -0.01em; }
+  .chips { display: flex; gap: 10px; margin-top: 44px; }
+  .chip { font-family: 'Mono', monospace; font-size: 16px; padding: 9px 15px; border-radius: 999px; color: #C9CEDA;
+    border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); }
+  .frame { position: absolute; right: 78px; top: 78px; width: 340px; height: 425px; border-radius: 28px; padding: 2px;
+    background: linear-gradient(140deg, rgba(122,162,255,.9), rgba(180,140,255,.25) 45%, rgba(255,255,255,.08));
+    transform: perspective(900px) rotateY(-10deg) rotateX(3deg);
+    box-shadow: 0 40px 90px rgba(40, 60, 160, .45), 0 0 0 1px rgba(255,255,255,.05); }
+  .frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 26px; display: block; }
+  .frame::after { content: ''; position: absolute; inset: 2px; border-radius: 26px;
+    background: linear-gradient(180deg, transparent 55%, rgba(5,6,10,.55)); }
+  .tag { position: absolute; right: 64px; top: 474px; z-index: 2; font-family: 'Mono', monospace; font-size: 15px; color: #DDE2EE;
+    padding: 10px 16px; border-radius: 14px; background: rgba(12,14,22,.85); border: 1px solid rgba(255,255,255,.12); }
+  .tag b { color: #7AA2FF; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="content">
+    <div class="eyebrow"><span class="dot"></span>Portfolio · Full Stack · AI/ML · Embedded</div>
+    <h1>Rohit Kamble</h1>
+    <h2>Building intelligent<br />digital experiences.</h2>
+    <p class="roles">Full Stack Developer · AI/ML Enthusiast · Robotics &amp; IoT Engineer</p>
+    <div class="chips">
+      <span class="chip">React</span><span class="chip">Node.js</span><span class="chip">PyTorch</span><span class="chip">FastAPI</span><span class="chip">ESP32</span>
+    </div>
+  </div>
+  <div class="frame"><img src="data:image/jpeg;base64,__PORTRAIT__" alt="" /></div>
+  <div class="tag"><b>B.Tech EE</b> · 2026 · CGPA 7.8</div>
+</body>
+</html>

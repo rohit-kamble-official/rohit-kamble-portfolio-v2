@@ -1,0 +1,90 @@
+{
+  "rohit-portrait": {
+    "widths": [
+      400,
+      720
+    ],
+    "width": 720,
+    "height": 900
+  },
+  "projects/cardioai": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  },
+  "projects/clearlaw": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  },
+  "projects/ledgeriq": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  },
+  "projects/leetcode-ai": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  },
+  "projects/substation-sentinel": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  },
+  "projects/wind-turbine-01": {
+    "widths": [
+      640,
+      800
+    ],
+    "width": 800,
+    "height": 500
+  },
+  "projects/wind-turbine-02": {
+    "widths": [
+      640,
+      800
+    ],
+    "width": 800,
+    "height": 500
+  },
+  "projects/wind-turbine-03": {
+    "widths": [
+      640,
+      800
+    ],
+    "width": 800,
+    "height": 500
+  },
+  "projects/wind-turbine-04": {
+    "widths": [
+      640,
+      800
+    ],
+    "width": 800,
+    "height": 500
+  },
+  "projects/workspaceos": {
+    "widths": [
+      640,
+      1280
+    ],
+    "width": 1280,
+    "height": 800
+  }
+}

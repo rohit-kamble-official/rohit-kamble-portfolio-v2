@@ -1,51 +1,82 @@
-import { useState, useCallback } from 'react'
-import LoadingScreen from './components/LoadingScreen'
-import Cursor from './components/Cursor'
-import ScrollProgress from './components/ScrollProgress'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
+import { lazy, Suspense } from 'react'
+import Navbar from './components/Navbar.jsx'
+import CursorGlow from './components/CursorGlow.jsx'
+import Hero from './sections/Hero.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
-import Hero from './sections/Hero'
-import About from './sections/About'
-import Skills from './sections/Skills'
-import Projects from './sections/Projects'
-import Experience from './sections/Experience'
-import Achievements from './sections/Achievements'
-import Services from './sections/Services'
-import Contact from './sections/Contact'
+// Below-the-fold sections are separate chunks. Their HTML is fully prerendered at build time,
+// and React hydrates each Suspense boundary on its own (selective hydration), keeping the
+// main thread free during start-up.
+const About = lazy(() => import('./sections/About.jsx'))
+const Skills = lazy(() => import('./sections/Skills.jsx'))
+const Experience = lazy(() => import('./sections/Experience.jsx'))
+const Projects = lazy(() => import('./sections/Projects.jsx'))
+const Certifications = lazy(() => import('./sections/Credentials.jsx').then((m) => ({ default: m.Certifications })))
+const Education = lazy(() => import('./sections/Credentials.jsx').then((m) => ({ default: m.Education })))
+const Achievements = lazy(() => import('./sections/Credentials.jsx').then((m) => ({ default: m.Achievements })))
+const GitHubActivity = lazy(() => import('./sections/GitHubActivity.jsx'))
+const Contact = lazy(() => import('./sections/Contact.jsx'))
+const Footer = lazy(() => import('./components/Footer.jsx'))
+
+const SectionError = () => (
+  <div className="container-x py-16 text-center text-[15px] text-fg-2" role="alert">
+    This section couldn&apos;t load.{' '}
+    <button type="button" className="underline underline-offset-4 hover:text-white" onClick={() => window.location.reload()}>
+      Reload the page
+    </button>
+  </div>
+)
+
+// Each lazy section gets its own error boundary, so one failed chunk never blanks the page.
+const Section = ({ children }) => (
+  <ErrorBoundary fallback={<SectionError />}>
+    <Suspense fallback={null}>{children}</Suspense>
+  </ErrorBoundary>
+)
 
 export default function App() {
-  const [loaded, setLoaded] = useState(false)
-  const handleDone = useCallback(() => setLoaded(true), [])
-
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-200 overflow-x-hidden">
-      {/* Loading screen — shown first */}
-      {!loaded && <LoadingScreen onDone={handleDone} />}
-
-      {/* Main site — fades in after loading */}
-      <div style={{
-        opacity: loaded ? 1 : 0,
-        transition: 'opacity 0.6s ease',
-        visibility: loaded ? 'visible' : 'hidden',
-      }}>
-        <Cursor />
-        <ScrollProgress />
-        <Navbar />
-
-        <main>
-          <Hero />
+    <>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
+      <div className="scroll-progress" aria-hidden="true" />
+      <CursorGlow />
+      <Navbar />
+      <main id="main" tabIndex={-1} className="relative outline-none">
+        <Hero />
+        <Section>
           <About />
+        </Section>
+        <Section>
           <Skills />
-          <Projects />
+        </Section>
+        <Section>
           <Experience />
-          <Services />
+        </Section>
+        <Section>
+          <Projects />
+        </Section>
+        <Section>
+          <Certifications />
+        </Section>
+        <Section>
+          <Education />
+        </Section>
+        <Section>
           <Achievements />
+        </Section>
+        <Section>
+          <GitHubActivity />
+        </Section>
+        <Section>
           <Contact />
-        </main>
-
+        </Section>
+      </main>
+      <Section>
         <Footer />
-      </div>
-    </div>
+      </Section>
+      <div className="noise" aria-hidden="true" />
+    </>
   )
 }

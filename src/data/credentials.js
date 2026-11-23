@@ -1,0 +1,122 @@
+// Education, certifications and achievements (sources: Portfolio V2 + resume/CV).
+// Credential URLs are not public yet. Add `url` to a certification to show a "View credential" link.
+
+export const education = {
+  degree: 'Bachelor of Technology, Electrical Engineering',
+  minor: 'Minor in Computer Science',
+  institute: 'S.B. Jain Institute of Technology, Management and Research',
+  location: 'Nagpur, Maharashtra',
+  period: '2022 – 2026',
+  cgpa: 7.8,
+  cgpaScale: 10,
+  coursework: [
+    'Data Structures & Algorithms',
+    'Object-Oriented Programming',
+    'Database Management Systems',
+    'Operating Systems',
+    'Computer Networks',
+    'Machine Learning',
+    'Full-Stack Development (MERN)',
+    'Advanced Algorithms',
+  ],
+  highlights: [
+    { label: 'Final-year project', value: 'Substation Sentinel: ESP32-CAM inspection rover (project lead)', project: 'substation-sentinel' },
+    { label: 'Leadership', value: 'Vice-Chairperson, IEEE SBJITMR (2025–2026)' },
+  ],
+  learning: ['System design', 'Cloud architecture', 'Docker & Kubernetes', 'GraphQL'],
+}
+
+export const certifications = [
+  {
+    id: 'nptel-java',
+    title: 'Programming in Java',
+    issuer: 'NPTEL · IIT Kharagpur',
+    date: 'Jan – Apr 2024',
+    kind: 'Course',
+    badge: 'Elite',
+    description: 'Earned Elite certification in the 12-week NPTEL course on Programming in Java.',
+    icon: 'code',
+  },
+  {
+    id: 'android-virtual',
+    title: 'Android Developer Virtual Internship',
+    issuer: 'AICTE × EduSkills',
+    date: 'Oct – Dec 2024',
+    kind: 'Internship',
+    description: '10-week virtual internship on Android app development with Google developer tools and the Android SDK.',
+    icon: 'phone',
+  },
+  {
+    id: 'apna-dsa',
+    title: 'Alpha: DSA with Java',
+    issuer: 'Apna College',
+    date: null,
+    kind: 'Course',
+    description: 'Data structures and algorithms in Java: arrays, trees, graphs and dynamic programming.',
+    icon: 'graph',
+  },
+  {
+    id: 'hack-for-impact',
+    title: 'Certificate of Excellence: Hack for Impact',
+    issuer: 'IIIT Delhi · E-Summit 2025',
+    date: '2025',
+    kind: 'Recognition',
+    badge: 'Top 6',
+    description: 'Awarded for reaching the Top 6 of 5,000+ teams after three selection rounds.',
+    icon: 'award',
+  },
+  {
+    id: 'ieee-pes',
+    title: 'IEEE PES Day 2024: Brand Ambassador',
+    issuer: 'IEEE Power & Energy Society',
+    date: '2024',
+    kind: 'Recognition',
+    description: 'Recognised for leading IEEE Power & Energy Society Day awareness at the institute level.',
+    icon: 'bolt',
+  },
+]
+
+export const achievements = [
+  {
+    id: 'hack-for-impact',
+    rank: 'Top 6',
+    title: 'Hack for Impact Finalist',
+    org: 'IIIT Delhi · E-Summit',
+    year: '2025',
+    body: 'Selected from 5,000+ teams across India. Advanced through three rounds with an AI-powered solution and earned a Certificate of Excellence.',
+    stat: { value: '5,000+', label: 'teams competed' },
+    featured: true,
+  },
+  {
+    id: 'tech-trek',
+    rank: '3rd',
+    title: 'Tech Trek Hackathon',
+    org: 'Sadhabai Raisoni College of Engineering',
+    year: '2024',
+    body: 'Third prize (₹8,000) among 300+ teams for a smart automation solution; built a working full-stack prototype in 24 hours.',
+  },
+  {
+    id: 'srujanotsava',
+    rank: '1st',
+    title: 'Srujanotsava 1.0 Project Exhibition',
+    org: 'S.B. Jain Institute of Technology',
+    year: '2024',
+    body: 'First prize among 200+ participants for the "Automatic Prasad Distributor", recognised for innovation and practical implementation.',
+  },
+  {
+    id: 'ieee-vice-chair',
+    rank: 'Lead',
+    title: 'Vice-Chairperson, IEEE SBJITMR',
+    org: 'IEEE Student Branch',
+    year: '2025–26',
+    body: 'Organised 5+ technical events and workshops for 150+ attendees.',
+  },
+  {
+    id: 'ieee-pes-ambassador',
+    rank: 'PES',
+    title: 'IEEE PES Day Ambassador',
+    org: 'IEEE Power & Energy Society',
+    year: '2024',
+    body: 'Led IEEE Power & Energy Society awareness activities at the institute level.',
+  },
+]

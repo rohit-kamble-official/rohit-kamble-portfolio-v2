@@ -1,137 +1,102 @@
-import SectionHeader from '../components/SectionHeader'
-import { useScrollReveal } from '../hooks/useScrollReveal'
-import { experience, education } from '../utils/data'
-
-const dotColors = {
-  neon: 'bg-violet-500 shadow-[0_0_12px_#7c3aed]',
-  cyan: 'bg-cyan-400 shadow-[0_0_12px_#06b6d4]',
-  pink: 'bg-pink-400 shadow-[0_0_12px_#ec4899]',
-  gold: 'bg-yellow-400 shadow-[0_0_12px_#fbbf24]',
-}
-
-const periodColors = {
-  neon: 'bg-[rgba(124,58,237,0.1)] border-[rgba(124,58,237,0.25)] text-violet-300',
-  cyan: 'bg-[rgba(6,182,212,0.1)] border-[rgba(6,182,212,0.25)] text-cyan-300',
-  pink: 'bg-[rgba(236,72,153,0.1)] border-[rgba(236,72,153,0.25)] text-pink-300',
-  gold: 'bg-[rgba(251,191,36,0.1)] border-[rgba(251,191,36,0.25)] text-yellow-300',
-}
-
-function TimelineItem({ item, delay }) {
-  const { ref, isVisible } = useScrollReveal()
-  return (
-    <div
-      ref={ref}
-      className={`relative pl-8 pb-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {/* Dot */}
-      <div className={`absolute left-0 top-4 w-2.5 h-2.5 rounded-full -translate-x-[5px] ${dotColors[item.color] || dotColors.neon}`} />
-
-      <div className="glass-card rounded-2xl p-5 hover:border-[rgba(124,58,237,0.3)] hover:-translate-y-0.5 transition-all duration-300">
-        <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
-          <h4 className="font-syne font-bold text-white text-base">{item.title}</h4>
-          <span className={`text-xs font-mono px-3 py-1 rounded-full border ${periodColors[item.color] || periodColors.neon}`}>
-            {item.period}
-          </span>
-        </div>
-        <p className="text-sm font-medium mb-3" style={{ color: item.color === 'neon' ? '#a78bfa' : item.color === 'cyan' ? '#06b6d4' : item.color === 'pink' ? '#ec4899' : '#fbbf24' }}>
-          🏢 {item.company}{item.location ? `, ${item.location}` : ''}
-        </p>
-        <ul className="space-y-1.5">
-          {item.highlights.map((h, i) => (
-            <li key={i} className="text-slate-400 text-sm leading-relaxed flex gap-2">
-              <span className="text-violet-400 mt-0.5 flex-shrink-0">▸</span>
-              <span dangerouslySetInnerHTML={{
-                __html: h.replace(/\*\*(.+?)\*\*/g, '<strong class="text-slate-200">$1</strong>')
-              }} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-function EducationCard({ edu }) {
-  const { ref, isVisible } = useScrollReveal()
-  return (
-    <div
-      ref={ref}
-      className={`relative pl-8 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-    >
-      <div className="absolute left-0 top-4 w-2.5 h-2.5 rounded-full -translate-x-[5px] bg-violet-300 shadow-[0_0_12px_#a78bfa]" />
-      <div className="glass-card rounded-2xl p-6 hover:border-[rgba(124,58,237,0.3)] hover:-translate-y-0.5 transition-all duration-300">
-        <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
-          <h4 className="font-syne font-bold text-white text-base">{edu.degree}</h4>
-          <span className="text-xs font-mono px-3 py-1 rounded-full border bg-[rgba(167,139,250,0.1)] border-[rgba(167,139,250,0.25)] text-violet-300">
-            {edu.period}
-          </span>
-        </div>
-        {edu.minor && (
-          <p className="text-violet-400 text-sm font-medium mb-1">{edu.minor}</p>
-        )}
-        <p className="text-cyan-400 text-sm mb-1">🏛️ {edu.institute}</p>
-        <p className="text-slate-400 text-sm mb-4">
-          CGPA: <strong className="text-white font-bold text-base">{edu.cgpa}</strong>
-          <span className="text-slate-500"> / 10.0</span>
-        </p>
-        <div>
-          <p className="section-label mb-2">Relevant Coursework</p>
-          <div className="flex flex-wrap gap-1.5">
-            {edu.coursework.map(c => (
-              <span key={c} className="px-2 py-0.5 text-[11px] font-mono bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.07)] rounded text-slate-400">
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+import { useEffect, useRef } from 'react'
+import { experience } from '../data/experience.js'
+import { spot } from '../lib/hooks.js'
+import { Reveal, SectionHeader } from '../components/ui.jsx'
+import Icon from '../components/Icon.jsx'
 
 export default function Experience() {
+  const timeline = useRef(null)
+
+  // Fill the rail as the timeline scrolls through the viewport.
+  useEffect(() => {
+    const el = timeline.current
+    if (!el) return
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const r = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      const progress = Math.min(1, Math.max(0, (vh * 0.65 - r.top) / r.height))
+      el.style.setProperty('--progress', progress.toFixed(3))
+    }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
   return (
-    <section id="experience" className="max-w-6xl mx-auto px-6 py-24">
-      <SectionHeader
-        label="Experience & Education"
-        title="My Journey"
-        subtitle="4 internships across full-stack dev, ML engineering, Android, and data analytics — building real-world expertise."
-      />
+    <section id="experience" className="section" aria-labelledby="experience-title">
+      <div className="container-x relative">
+        <SectionHeader
+          id="experience-title"
+          eyebrow="Professional experience"
+          title={
+            <>
+              Learning by <span className="text-gradient">shipping real software.</span>
+            </>
+          }
+          lead="Four internships across web development, data analytics, Android and machine learning, from production client apps to predictive models."
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Internships */}
-        <div>
-          <p className="section-label mb-6">💼 Professional Internships</p>
-          <div className="relative">
-            <div className="timeline-line" />
-            {experience.map((exp, i) => (
-              <TimelineItem key={exp.title} item={exp} delay={i * 100} />
+        <div ref={timeline} className="timeline">
+          <span className="timeline-rail" aria-hidden="true" />
+          <ol className="space-y-6 lg:space-y-8">
+            {experience.map((job, i) => (
+              <Reveal as="li" key={job.id} delay={60} className="relative grid gap-4 pl-12 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-20 lg:pl-0">
+                <span className="timeline-node" data-current={job.current ? 'true' : 'false'} aria-hidden="true" />
+                <div className="lg:pt-5 lg:text-right">
+                  <p className="font-mono text-[12.5px] tracking-wide text-white/85">{job.period}</p>
+                  <p className="mt-1 text-[13px] text-fg-3">{job.location}</p>
+                  <span className={`chip mt-3 ${job.current ? 'border-[#3ee6a0]/35 text-[#8ff0c4]' : ''}`}>
+                    {job.current && <span className="pulse-dot !h-1.5 !w-1.5" aria-hidden="true" />}
+                    {job.current ? 'Current' : job.type}
+                  </span>
+                </div>
+
+                <article className="card spotlight p-6 sm:p-7" onPointerMove={spot} aria-labelledby={`job-${job.id}`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 id={`job-${job.id}`} className="text-[1.2rem] font-semibold tracking-tight text-white">
+                        {job.role}
+                      </h3>
+                      <p className="mt-1 flex items-center gap-2 text-[15px] text-fg-2">
+                        <Icon name="briefcase" size={15} className="text-brand-blue" />
+                        {job.company}
+                        {job.current && <span className="text-fg-3">· {job.type}</span>}
+                      </p>
+                    </div>
+                    <span className="font-mono text-[11px] text-fg-3" aria-hidden="true">
+                      {String(experience.length - i).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-[15px] text-white/80">{job.summary}</p>
+                  <ul className="mt-4 space-y-2.5">
+                    {job.highlights.map((h) => (
+                      <li key={h} className="flex gap-3 text-[14.5px] leading-relaxed text-fg-2">
+                        <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand-blue" aria-hidden="true" />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                  <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Skills used">
+                    {job.tags.map((t) => (
+                      <li key={t} className="chip chip-mono">
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              </Reveal>
             ))}
-          </div>
-        </div>
-
-        {/* Education */}
-        <div>
-          <p className="section-label mb-6">🎓 Academic Background</p>
-          <div className="relative">
-            <div className="timeline-line" />
-            {education.map((edu) => (
-              <EducationCard key={edu.degree} edu={edu} />
-            ))}
-          </div>
-
-          {/* Currently studying */}
-          <div className="mt-6 p-5 rounded-2xl border border-[rgba(6,182,212,0.2)] bg-[rgba(6,182,212,0.04)]">
-            <p className="section-label mb-3">📚 Currently Learning</p>
-            <div className="flex flex-wrap gap-2">
-              {['System Design', 'Cloud Architecture', 'Docker & Kubernetes', 'GraphQL', 'Next.js 15'].map(s => (
-                <span key={s} className="px-3 py-1 text-xs font-mono rounded-lg border border-[rgba(6,182,212,0.2)] bg-[rgba(6,182,212,0.05)] text-cyan-300">
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
+          </ol>
         </div>
       </div>
     </section>

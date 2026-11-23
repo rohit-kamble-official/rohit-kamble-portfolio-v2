@@ -1,0 +1,66 @@
+// Dates follow the resume in /public and the latest CV (Nov 2026).
+
+export const experience = [
+  {
+    id: 'zonova',
+    role: 'Web Developer Intern',
+    company: 'Zonova Creative Agency',
+    location: 'Pune, Maharashtra',
+    period: 'May 2025 – Oct 2025',
+    type: 'Internship',
+    summary: 'Built and optimised production client applications in an Agile team.',
+    highlights: [
+      'Developed and maintained 5+ production client web applications, including the Social Flow Portal, with React.js, Node.js, Express.js, MongoDB and REST APIs.',
+      'Improved application performance by 40% through code splitting, lazy loading, asset optimisation and Lighthouse audits.',
+      'Built 20+ reusable React components, reducing feature development time by 25%.',
+      'Shipped on schedule with UI/UX designers and backend engineers using Git, pull requests and code reviews.',
+    ],
+    tags: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'REST APIs'],
+  },
+  {
+    id: 'istudio',
+    role: 'Data Analytics Intern',
+    company: 'iStudio',
+    location: 'Nagpur, Maharashtra',
+    period: 'Jan 2025 – Mar 2025',
+    type: 'Internship',
+    summary: 'Automated reporting and built KPI dashboards for business decisions.',
+    highlights: [
+      'Automated SQL reporting workflows with stored procedures, cutting manual data processing by 50% and saving 10+ hours per week.',
+      'Built 3 interactive KPI dashboards tracking 10+ business metrics for real-time, data-driven decisions.',
+      'Analysed a 10,000-row dataset with SQL and Tableau to surface key business insights.',
+      'Selected through the Internship Common Aptitude Test (ICAT).',
+    ],
+    tags: ['SQL', 'Stored procedures', 'Tableau', 'KPI dashboards'],
+  },
+  {
+    id: 'indiaedu',
+    role: 'Android Developer Intern',
+    company: 'India Edu Program',
+    location: 'Remote',
+    period: 'Oct 2024 – Dec 2024',
+    type: 'Virtual internship',
+    summary: '10-week AICTE–EduSkills virtual internship on Android development with Google developer tools.',
+    highlights: [
+      'Built 4+ Android UI screens following Material Design, with REST API integration via Retrofit.',
+      'Improved app responsiveness by 20% and reduced load time by 15%.',
+      'Worked through API integration, coding simulations and debugging on real-world Android apps.',
+    ],
+    tags: ['Android', 'Retrofit', 'Material Design', 'REST APIs'],
+  },
+  {
+    id: 'codemate',
+    role: 'Machine Learning Intern',
+    company: 'Codemate IT Services (OPC) Pvt. Ltd.',
+    location: 'Nagpur, Maharashtra',
+    period: 'May 2024 – Jun 2024',
+    type: 'Internship',
+    summary: 'Built and evaluated predictive machine-learning models on real-world data.',
+    highlights: [
+      'Built and evaluated predictive machine-learning models in Python with Pandas, NumPy and scikit-learn on real-world datasets.',
+      'Handled data preprocessing, feature engineering, model testing and debugging to improve predictive accuracy.',
+      'Worked with the engineering team to integrate ML models into production workflows.',
+    ],
+    tags: ['Python', 'Pandas', 'NumPy', 'scikit-learn', 'TensorFlow'],
+  },
+]

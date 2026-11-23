@@ -1,157 +1,283 @@
-import SectionHeader from '../components/SectionHeader'
-import { useScrollReveal } from '../hooks/useScrollReveal'
-import { skills } from '../utils/data'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { skillMap, allSkills } from '../data/skills.js'
+import { openProject, useInView, useReducedMotion } from '../lib/hooks.js'
+import { Reveal, SectionHeader } from '../components/ui.jsx'
+import Icon from '../components/Icon.jsx'
 
-const colorMap = {
-  purple: {
-    icon: 'rgba(124,58,237,0.15)',
-    chip: { bg:'rgba(124,58,237,0.1)', border:'rgba(124,58,237,0.3)', color:'#c4b5fd' },
-    glow: '0 0 30px rgba(124,58,237,0.12)',
-    border: 'rgba(124,58,237,0.5)',
-  },
-  cyan: {
-    icon: 'rgba(6,182,212,0.15)',
-    chip: { bg:'rgba(6,182,212,0.1)', border:'rgba(6,182,212,0.3)', color:'#67e8f9' },
-    glow: '0 0 30px rgba(6,182,212,0.1)',
-    border: 'rgba(6,182,212,0.4)',
-  },
-  gold: {
-    icon: 'rgba(251,191,36,0.15)',
-    chip: { bg:'rgba(251,191,36,0.1)', border:'rgba(251,191,36,0.3)', color:'#fde68a' },
-    glow: '0 0 30px rgba(251,191,36,0.1)',
-    border: 'rgba(251,191,36,0.4)',
-  },
-  pink: {
-    icon: 'rgba(236,72,153,0.15)',
-    chip: { bg:'rgba(236,72,153,0.1)', border:'rgba(236,72,153,0.3)', color:'#f9a8d4' },
-    glow: '0 0 30px rgba(236,72,153,0.1)',
-    border: 'rgba(236,72,153,0.4)',
-  },
-  green: {
-    icon: 'rgba(34,197,94,0.15)',
-    chip: { bg:'rgba(34,197,94,0.1)', border:'rgba(34,197,94,0.3)', color:'#86efac' },
-    glow: '0 0 30px rgba(34,197,94,0.12)',
-    border: 'rgba(34,197,94,0.4)',
-  },
+// Even distribution of n points on a unit sphere.
+function fibonacciSphere(n) {
+  const pts = []
+  const phi = Math.PI * (3 - Math.sqrt(5))
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / Math.max(1, n - 1)) * 2
+    const r = Math.sqrt(1 - y * y)
+    const t = phi * i
+    pts.push([Math.cos(t) * r, y, Math.sin(t) * r])
+  }
+  return pts
 }
 
-// Docker SVG icon
-const DockerSVG = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style={{display:'inline',marginRight:'3px',verticalAlign:'middle'}}>
-    <path d="M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.185-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.185v1.888c0 .102.084.185.186.185m-2.92 0h2.12a.186.186 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 0 0 3.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z"/>
-  </svg>
-)
+const RADIUS = 0.39 // fraction of the globe size
+const INITIAL = { x: -0.22, y: 0.4 }
 
-function SkillCard({ skill, delay }) {
-  const { ref, isVisible } = useScrollReveal()
-  const c = colorMap[skill.color] || colorMap.purple
-  const isDevOps = skill.category === 'DevOps & Cloud'
+function project([x, y, z], rx, ry) {
+  const cy = Math.cos(ry)
+  const sy = Math.sin(ry)
+  const cx = Math.cos(rx)
+  const sx = Math.sin(rx)
+  const x1 = x * cy + z * sy
+  const z1 = -x * sy + z * cy
+  const y2 = y * cx - z1 * sx
+  const z2 = y * sx + z1 * cx
+  return [x1, y2, z2]
+}
+
+/** CSS-3D "tech globe": every skill orbits on a sphere; drag to spin, click to pick a category. */
+function SkillGlobe({ activeGroup, onSelect }) {
+  const reduced = useReducedMotion()
+  const [viewRef, inView] = useInView({ once: false, rootMargin: '100px' })
+  const box = useRef(null)
+  const tags = useRef([])
+  const rot = useRef({ ...INITIAL, vy: 0, dragging: false, lastX: 0, lastY: 0, hover: false, size: 0 })
+  const points = useMemo(() => fibonacciSphere(allSkills.length), [])
+
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      rot.current.size = entry.contentRect.width
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView) return
+    let raf = 0
+    let switched = false
+    const tick = () => {
+      const r = rot.current
+      if (!r.dragging) {
+        const auto = reduced ? 0 : r.hover ? 0.0009 : 0.0034
+        r.y += auto + r.vy
+        r.vy *= 0.94
+      }
+      const R = r.size * (r.size < 420 ? 0.33 : RADIUS)
+      if (R > 0) {
+        for (let i = 0; i < points.length; i++) {
+          const el = tags.current[i]
+          if (!el) continue
+          if (!switched) {
+            el.style.left = '50%'
+            el.style.top = '50%'
+          }
+          const [x, y, z] = project(points[i], r.x, r.y)
+          const depth = (z + 1) / 2 // 0 back, 1 front
+          el.style.transform = `translate3d(${(x * R).toFixed(1)}px, ${(y * R).toFixed(1)}px, 0) scale(${(0.64 + depth * 0.46).toFixed(3)})`
+          el.style.opacity = (0.18 + depth * 0.82).toFixed(3)
+          el.style.zIndex = String(Math.round(depth * 100))
+        }
+        switched = true
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [inView, points, reduced])
+
+  const onPointerDown = (e) => {
+    const r = rot.current
+    r.dragging = true
+    r.lastX = e.clientX
+    r.lastY = e.clientY
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+  }
+  const onPointerMove = (e) => {
+    const r = rot.current
+    if (!r.dragging) return
+    const dx = e.clientX - r.lastX
+    const dy = e.clientY - r.lastY
+    r.lastX = e.clientX
+    r.lastY = e.clientY
+    r.y += dx * 0.006
+    r.x = Math.max(-1.1, Math.min(1.1, r.x - dy * 0.006))
+    r.vy = dx * 0.0009
+  }
+  const endDrag = () => (rot.current.dragging = false)
 
   return (
     <div
-      ref={ref}
-      className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-700 hover:-translate-y-1.5 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      }`}
-      style={{
-        transitionDelay: `${delay}ms`,
-        background: 'rgba(255,255,255,0.02)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        cursor: 'default',
+      ref={(el) => {
+        box.current = el
+        viewRef.current = el
       }}
-      onMouseEnter={e => {
-        e.currentTarget.style.borderColor = c.border
-        e.currentTarget.style.boxShadow = c.glow
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
-        e.currentTarget.style.boxShadow = 'none'
+      className="globe"
+      aria-hidden="true"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onPointerEnter={() => (rot.current.hover = true)}
+      onPointerLeave={() => {
+        rot.current.hover = false
+        endDrag()
       }}
     >
-      {/* Hover gradient overlay */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: `linear-gradient(135deg,${c.icon},transparent)` }} />
-
-      {/* Featured star for DevOps */}
-      {isDevOps && (
-        <div className="absolute top-3 right-3 text-[10px] font-mono px-2 py-0.5 rounded-full"
-          style={{ background:'rgba(34,197,94,0.12)', border:'1px solid rgba(34,197,94,0.3)', color:'#86efac' }}>
-          ⭐ In-Demand
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="relative flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-          style={{ background: c.icon }}>
-          {skill.icon}
-        </div>
-        <span className="font-syne font-bold text-white text-[0.95rem]">{skill.category}</span>
-      </div>
-
-      {/* Chips */}
-      <div className="relative flex flex-wrap gap-2">
-        {skill.chips.map((chip) => (
+      <div className="globe-ring" />
+      {allSkills.map((s, i) => {
+        const [x, y, z] = project(points[i], INITIAL.x, INITIAL.y)
+        const depth = (z + 1) / 2
+        const isActive = s.group === activeGroup
+        return (
           <span
-            key={chip}
-            className="px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all duration-300 hover:-translate-y-0.5 hover:brightness-125 cursor-default"
-            style={{ background: c.chip.bg, borderColor: c.chip.border, color: c.chip.color }}
+            key={`${s.group}-${s.name}`}
+            ref={(el) => (tags.current[i] = el)}
+            className="globe-tag"
+            data-hue={s.hue}
+            data-active={isActive ? 'true' : 'false'}
+            data-dim={isActive ? 'false' : 'true'}
+            onClick={() => onSelect(s.group)}
+            style={{
+              left: `${50 + x * RADIUS * 100}%`,
+              top: `${50 + y * RADIUS * 100}%`,
+              opacity: 0.18 + depth * 0.82,
+              transform: `scale(${(0.64 + depth * 0.46).toFixed(3)})`,
+              zIndex: Math.round(depth * 100),
+            }}
           >
-            {chip === 'Docker' && <DockerSVG />}
-            {chip}
+            {s.name}
           </span>
-        ))}
-      </div>
+        )
+      })}
     </div>
   )
 }
 
 export default function Skills() {
+  const [active, setActive] = useState(skillMap[0].id)
+  const tabRefs = useRef([])
+  const group = skillMap.find((g) => g.id === active)
+
+  const onKeyDown = (e, index) => {
+    const keys = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }
+    let next = null
+    if (e.key in keys) next = (index + keys[e.key] + skillMap.length) % skillMap.length
+    if (e.key === 'Home') next = 0
+    if (e.key === 'End') next = skillMap.length - 1
+    if (next === null) return
+    e.preventDefault()
+    setActive(skillMap[next].id)
+    tabRefs.current[next]?.focus()
+  }
+
   return (
-    <div id="skills" className="py-24"
-      style={{ background: 'linear-gradient(180deg,#0a0a0f 0%,#0f0f1a 50%,#0a0a0f 100%)' }}>
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="skills" className="section" aria-labelledby="skills-title">
+      <div aria-hidden="true" className="section-glow right-[-8%] top-[10%] h-[460px] w-[460px] bg-[#6b3fd8]/25" />
+      <div className="container-x relative">
         <SectionHeader
-          label="Technical skills"
-          title="Tech Arsenal"
-          subtitle="Built through 4 internships, hackathons, and relentless self-study — from MERN Stack to Docker, CI/CD & AWS."
+          id="skills-title"
+          eyebrow="Technical skills"
+          title={
+            <>
+              One toolkit, <span className="text-gradient">software to silicon.</span>
+            </>
+          }
+          lead="Pick a category or spin the globe. Every skill links to the projects and roles where I actually used it, with no made-up percentages."
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {skills.map((skill, i) => (
-            <SkillCard key={skill.category} skill={skill} delay={i * 75} />
-          ))}
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-16">
+          <Reveal>
+            <div
+              role="tablist"
+              aria-label="Skill categories"
+              aria-orientation="vertical"
+              className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-2 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0"
+            >
+              {skillMap.map((g, i) => (
+                <button
+                  key={g.id}
+                  ref={(el) => (tabRefs.current[i] = el)}
+                  role="tab"
+                  type="button"
+                  id={`skill-tab-${g.id}`}
+                  aria-selected={active === g.id}
+                  aria-controls="skills-panel"
+                  tabIndex={active === g.id ? 0 : -1}
+                  data-hue={g.hue}
+                  className="skill-tab shrink-0 max-lg:w-auto"
+                  onClick={() => setActive(g.id)}
+                  onKeyDown={(e) => onKeyDown(e, i)}
+                >
+                  <span className="dot">
+                    <Icon name={g.icon} size={16} />
+                  </span>
+                  <span className="whitespace-nowrap text-[14.5px] font-medium">{g.label}</span>
+                  <span className="ml-auto pl-3 font-mono text-[11px] text-fg-3 max-lg:hidden">{String(g.skills.length).padStart(2, '0')}</span>
+                </button>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={120} className="relative">
+            <SkillGlobe activeGroup={active} onSelect={setActive} />
+            <p className="mt-2 text-center font-mono text-[11px] uppercase tracking-[0.16em] text-fg-3 max-sm:hidden">Drag to rotate · click a skill</p>
+          </Reveal>
         </div>
 
-        {/* DevOps highlight strip */}
-        <div className="mt-8 p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center gap-5"
-          style={{ border:'1px solid rgba(34,197,94,0.2)', background:'rgba(34,197,94,0.03)' }}>
-          <div className="text-3xl flex-shrink-0">🐳</div>
-          <div className="flex-1">
-            <p className="font-syne font-bold text-white text-base mb-1">Docker · CI/CD Pipelines · AWS</p>
-            <p className="text-slate-400 text-sm">Experienced in containerizing apps with Docker, setting up GitHub Actions CI/CD workflows, and deploying on AWS EC2 &amp; S3 — production-grade DevOps for real-world projects.</p>
+        <div id="skills-panel" role="tabpanel" aria-labelledby={`skill-tab-${active}`} className="mt-14" data-hue={group.hue}>
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h3 className="text-[1.35rem] font-semibold tracking-tight text-white">{group.label}</h3>
+              <p className="mt-1 text-[15px] text-fg-2">{group.blurb}</p>
+            </div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-fg-3">{group.skills.length} skills</p>
           </div>
-          <div className="flex flex-wrap gap-2 flex-shrink-0">
-            {['docker run', 'gh actions', 'aws s3 cp', 'aws ec2'].map(cmd => (
-              <span key={cmd} className="px-2.5 py-1 text-[11px] font-mono rounded-lg"
-                style={{ background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.2)', color:'#86efac' }}>
-                $ {cmd}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Always learning bar */}
-        <div className="mt-4 p-4 rounded-2xl text-center"
-          style={{ border:'1px solid rgba(255,255,255,0.06)', background:'rgba(255,255,255,0.01)' }}>
-          <p className="text-slate-500 text-sm">
-            Always learning · Currently exploring{' '}
-            <span className="text-violet-400 font-medium">System Design</span>,{' '}
-            <span className="text-cyan-400 font-medium">Kubernetes</span> &amp;{' '}
-            <span className="text-green-400 font-medium">Cloud Architecture</span>
-          </p>
+          <ul key={active} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {group.skills.map((s, i) => {
+              const uses = s.usedIn.length + s.roles.length
+              return (
+                <li key={s.name} className="skill-item" data-hue={group.hue} style={{ animation: `fade-up .6s var(--ease-out-expo) both ${i * 40}ms` }}>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="flex items-center gap-2.5 text-[15px] font-semibold text-white">
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--hue)', boxShadow: '0 0 10px var(--hue)' }} aria-hidden="true" />
+                      {s.name}
+                    </p>
+                    {uses > 0 && (
+                      <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-3">
+                        {s.usedIn.length > 0 && `${s.usedIn.length} project${s.usedIn.length > 1 ? 's' : ''}`}
+                        {s.usedIn.length > 0 && s.roles.length > 0 && ' · '}
+                        {s.roles.length > 0 && `${s.roles.length} role${s.roles.length > 1 ? 's' : ''}`}
+                      </span>
+                    )}
+                  </div>
+                  {(s.usedIn.length > 0 || s.roles.length > 0 || s.note) && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {s.usedIn.slice(0, 3).map((p) => (
+                        <button
+                          key={p.slug}
+                          type="button"
+                          className="chip chip-mono transition-colors hover:border-white/20 hover:text-white"
+                          onClick={() => openProject(p.slug)}
+                        >
+                          {p.title}
+                        </button>
+                      ))}
+                      {s.usedIn.length > 3 && <span className="chip chip-mono text-fg-3">+{s.usedIn.length - 3}</span>}
+                      {s.roles.slice(0, 2).map((r) => (
+                        <a key={r.id} href="#experience" className="chip chip-mono text-fg-2 hover:text-white">
+                          <Icon name="briefcase" size={12} />
+                          {r.title}
+                        </a>
+                      ))}
+                      {s.note && <span className="chip chip-mono text-fg-2">{s.note}</span>}
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

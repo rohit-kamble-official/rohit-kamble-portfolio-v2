@@ -64,3 +64,6 @@ tailwind.config.js.timestamp-*
 # Mac system files
 .AppleDouble
 .LSOverride
+# Portfolio V3 build artefacts / local tooling
+dist-ssr/
+.claude/

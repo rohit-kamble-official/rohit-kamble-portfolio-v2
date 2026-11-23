@@ -1,316 +1,279 @@
-import { useEffect, useRef } from 'react'
-import { useTypingEffect } from '../hooks/useTypingEffect'
-import { personalInfo, techStack, typedRoles } from '../utils/data'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { profile } from '../data/profile.js'
+import { canUseWebGL, detectTier, onInteractionOrIdle, useInView } from '../lib/hooks.js'
+import ChipPoster from '../components/ChipPoster.jsx'
+import ErrorBoundary from '../components/ErrorBoundary.jsx'
+import Icon from '../components/Icon.jsx'
 
-// ── Icons ──────────────────────────────────────────────────────────
-const GithubIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.82.57C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
-  </svg>
-)
-const LinkedinIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.95v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.35-1.85 3.59 0 4.25 2.36 4.25 5.43v6.31zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/>
-  </svg>
-)
-const EmailIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="4" width="20" height="16" rx="2"/>
-    <polyline points="2,4 12,13 22,4"/>
-  </svg>
-)
-const DownloadIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-)
-const GridIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-  </svg>
-)
+const HeroScene = lazy(() => import('../three/HeroScene.jsx'))
 
-// ── Profile image with animated ring ───────────────────────────────
-function ProfileImage() {
-  return (
-    <div className="relative flex items-center justify-center" style={{ animation: 'fadeUp 0.9s 0.2s ease both', opacity: 0, animationFillMode: 'forwards' }}>
+const LINE_ONE = ['Building', 'Intelligent']
+const LINE_TWO = ['Digital', 'Experiences.']
 
-      {/* Outer animated rotating ring */}
-      <div
-        className="absolute rounded-full border-2 border-dashed border-violet-500/30"
-        style={{ width: 340, height: 340, animation: 'spin 18s linear infinite' }}
-      />
+const FLOATING = [
+  { label: 'React', color: '#61dafb', glyph: 'react', pos: 'left-[57%] top-[25%]', depth: 18, bob: '0s' },
+  { label: 'PyTorch', color: '#ff7a45', glyph: 'flame', pos: 'right-[8%] top-[19%]', depth: 26, bob: '1.2s' },
+  { label: 'ESP32', color: '#ffc25c', glyph: 'chip', pos: 'right-[3%] top-[50%]', depth: 14, bob: '2.1s' },
+  { label: 'Node.js', color: '#5fd068', glyph: 'hex', pos: 'left-[59%] top-[71%]', depth: 22, bob: '0.6s' },
+  { label: 'OpenCV', color: '#7aa2ff', glyph: 'eye', pos: 'right-[13%] top-[79%]', depth: 30, bob: '1.7s' },
+  { label: 'FastAPI', color: '#2fd6c3', glyph: 'bolt', pos: 'left-[70%] top-[11%]', depth: 12, bob: '2.6s' },
+]
 
-      {/* Neon glow ring */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          width: 300, height: 300,
-          background: 'transparent',
-          boxShadow: '0 0 60px rgba(124,58,237,0.35), 0 0 120px rgba(6,182,212,0.15)',
-          animation: 'orbFloat 6s ease-in-out infinite',
-        }}
-      />
-
-      {/* Floating tech badges around image */}
-      {[
-        { label: 'React', angle: 40,  r: 155, color: 'rgba(6,182,212,0.9)'   },
-        { label: 'Node.js', angle: 140, r: 155, color: 'rgba(124,58,237,0.9)' },
-        { label: 'Docker',  angle: 220, r: 155, color: 'rgba(6,182,212,0.9)'  },
-        { label: 'AWS',     angle: 310, r: 155, color: 'rgba(251,191,36,0.9)' },
-        { label: 'Python',  angle: 270, r: 160, color: 'rgba(236,72,153,0.9)' },
-      ].map(({ label, angle, r, color }) => {
-        const rad = (angle * Math.PI) / 180
-        const x = Math.cos(rad) * r
-        const y = Math.sin(rad) * r
-        return (
-          <div
-            key={label}
-            className="absolute text-[10px] font-mono font-bold px-2 py-0.5 rounded-full pointer-events-none select-none"
-            style={{
-              transform: `translate(${x}px, ${y}px)`,
-              background: 'rgba(10,10,15,0.85)',
-              border: `1px solid ${color}`,
-              color,
-              backdropFilter: 'blur(6px)',
-              whiteSpace: 'nowrap',
-              animation: `orbFloat ${4 + Math.random() * 3}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`,
-            }}
-          >
-            {label}
-          </div>
-        )
-      })}
-
-      {/* Main image container */}
-      <div
-        className="relative z-10 rounded-full overflow-hidden"
-        style={{
-          width: 260, height: 260,
-          border: '3px solid rgba(124,58,237,0.6)',
-          boxShadow: '0 0 40px rgba(124,58,237,0.4), 0 0 80px rgba(124,58,237,0.15), inset 0 0 20px rgba(124,58,237,0.05)',
-        }}
-      >
-        {/* Real profile image */}
-       <img
-  src="/Rohit .png"
-  alt="Rohit Kamble — Full Stack Developer"
-  className="w-full h-full object-cover object-top"
-  onError={(e) => {
-    e.target.style.display = 'none'
-    e.target.nextSibling.style.display = 'flex'
-  }}
-/>
-        {/* Fallback avatar */}
-        <div
-          className="w-full h-full items-center justify-center"
-          style={{
-            display: 'none',
-            background: 'linear-gradient(135deg, #1a0a3e 0%, #0a1a2e 50%, #0a2a3e 100%)',
-          }}
-        >
-          <span
-            className="font-syne font-black text-white select-none"
-            style={{ fontSize: '5rem', lineHeight: 1, textShadow: '0 0 40px rgba(124,58,237,0.8)' }}
-          >
-            RK
-          </span>
-        </div>
-
-        {/* Subtle overlay gradient for depth */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(160deg, rgba(124,58,237,0.08) 0%, transparent 60%, rgba(6,182,212,0.06) 100%)' }}
-        />
-      </div>
-
-      {/* Status badge pinned bottom-right of image */}
-      <div
-        className="absolute z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold"
-        style={{
-          bottom: '60px', right: '-10px',
-          background: 'rgba(10,10,15,0.92)',
-          border: '1px solid rgba(34,197,94,0.5)',
-          backdropFilter: 'blur(12px)',
-          color: '#86efac',
-        }}
-      >
-        <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_#22c55e] animate-pulse" />
-        Open to Work
-      </div>
-    </div>
-  )
+function Glyph({ type, color }) {
+  const common = {
+    width: 14,
+    height: 14,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: color,
+    strokeWidth: 2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    'aria-hidden': true,
+  }
+  switch (type) {
+    case 'react':
+      return (
+        <svg {...common}>
+          <ellipse cx="12" cy="12" rx="10" ry="4" />
+          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
+          <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
+          <circle cx="12" cy="12" r="1.6" fill={color} />
+        </svg>
+      )
+    case 'flame':
+      return (
+        <svg {...common}>
+          <path d="M12 3c3.5 3.2 6 6.4 6 10a6 6 0 0 1-12 0c0-2.4 1.2-4.5 3-6l.5 3.5L12 3Z" />
+        </svg>
+      )
+    case 'chip':
+      return (
+        <svg {...common}>
+          <rect x="6" y="6" width="12" height="12" rx="2" />
+          <path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" />
+        </svg>
+      )
+    case 'hex':
+      return (
+        <svg {...common}>
+          <path d="M12 2.5 20.5 7.3v9.4L12 21.5l-8.5-4.8V7.3Z" />
+        </svg>
+      )
+    case 'eye':
+      return (
+        <svg {...common}>
+          <circle cx="7" cy="8" r="3.2" />
+          <circle cx="17" cy="8" r="3.2" />
+          <circle cx="12" cy="16.5" r="3.2" />
+        </svg>
+      )
+    default:
+      return (
+        <svg {...common}>
+          <path d="M13 2.5 4.5 13.5H12l-1 8 8.5-11H12Z" />
+        </svg>
+      )
+  }
 }
 
-// ── Main Hero ───────────────────────────────────────────────────────
 export default function Hero() {
-  const typed = useTypingEffect(typedRoles, 75, 45, 2200)
   const heroRef = useRef(null)
+  const chipsRef = useRef(null)
+  const [tier, setTier] = useState('none')
+  const [load, setLoad] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [visRef, visible] = useInView({ once: false, rootMargin: '0px', threshold: 0 })
+  const [docVisible, setDocVisible] = useState(true)
 
-  // Spawn particles
+  // Decide whether / when to load the WebGL scene.
   useEffect(() => {
-    const hero = heroRef.current
-    if (!hero) return
-    const particles = []
-    for (let i = 0; i < 22; i++) {
-      const p = document.createElement('div')
-      p.className = 'particle'
-      const drift = (Math.random() - 0.5) * 220
-      const size = Math.random() < 0.25 ? 3 : 2
-      p.style.cssText = `
-        left: ${Math.random() * 100}%;
-        width: ${size}px; height: ${size}px;
-        animation-duration: ${10 + Math.random() * 12}s;
-        animation-delay: ${Math.random() * 10}s;
-        --drift: ${drift}px;
-        opacity: 0.45;
-      `
-      hero.appendChild(p)
-      particles.push(p)
+    let cancel = null
+    // Cheap size/device check first (phones never touch WebGL). The WebGL probe itself is
+    // deferred until the scene is about to load, so it never runs during start-up.
+    const evaluate = () => {
+      if (cancel) return
+      const t = detectTier()
+      if (t === 'none') return
+      setTier(t)
+      cancel = onInteractionOrIdle(
+        () => {
+          if (canUseWebGL()) setLoad(true)
+        },
+        t === 'high' ? 3500 : 5000,
+      )
+      window.removeEventListener('resize', evaluate)
     }
-    return () => particles.forEach(p => p.remove())
+    evaluate()
+    if (!cancel) window.addEventListener('resize', evaluate)
+    return () => {
+      window.removeEventListener('resize', evaluate)
+      cancel?.()
+    }
   }, [])
 
+  useEffect(() => {
+    const onVis = () => setDocVisible(document.visibilityState === 'visible')
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [])
+
+  // Mouse parallax for the floating tech chips (fine pointers only).
+  useEffect(() => {
+    const hero = heroRef.current
+    const chips = chipsRef.current
+    if (!hero || !chips || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let raf = 0
+    const onMove = (e) => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        const r = hero.getBoundingClientRect()
+        chips.style.setProperty('--px', (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3))
+        chips.style.setProperty('--py', (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3))
+      })
+    }
+    hero.addEventListener('pointermove', onMove, { passive: true })
+    return () => {
+      cancelAnimationFrame(raf)
+      hero.removeEventListener('pointermove', onMove)
+    }
+  }, [])
+
+  const setRefs = (el) => {
+    heroRef.current = el
+    visRef.current = el
+  }
+
+  let wordIndex = 0
+  const word = (w) => {
+    const i = wordIndex++
+    const isAccent = w === 'Intelligent'
+    return (
+      <span key={w} className="hero-word mr-[0.22em] last:mr-0" style={{ '--i': i }}>
+        <span className={isAccent ? 'shimmer' : undefined}>{w}</span>
+      </span>
+    )
+  }
+
   return (
-    <section
-      id="hero"
-      ref={heroRef}
-      className="relative min-h-screen flex items-center overflow-hidden px-6 pt-28 pb-16"
-    >
-      {/* Background grid */}
-      <div className="absolute inset-0 bg-grid z-0" />
+    <section id="home" ref={setRefs} className="hero" aria-labelledby="hero-title">
+      <div className="hero-bg" aria-hidden="true" />
+      <div className="hero-grid bg-grid" aria-hidden="true" />
 
-      {/* Orbs */}
-      <div className="orb w-[550px] h-[550px] bg-[rgba(124,58,237,0.13)] -top-32 -right-32" style={{ animationDelay: '0s' }} />
-      <div className="orb w-[400px] h-[400px] bg-[rgba(6,182,212,0.09)] -bottom-24 -left-24" style={{ animationDelay: '3s' }} />
-      <div className="orb w-[280px] h-[280px] bg-[rgba(236,72,153,0.07)] top-1/2 left-1/4" style={{ animationDelay: '5s' }} />
-
-      {/* ── Two-column layout ── */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-        {/* LEFT — Text content */}
-        <div>
-          {/* Available badge */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-violet-500/40 bg-violet-500/08 text-violet-300 text-xs uppercase tracking-widest mb-7"
-            style={{ animation: 'fadeUp 0.8s ease both', backgroundColor: 'rgba(124,58,237,0.08)' }}
-          >
-            <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_#22c55e] animate-pulse" />
-            Available for opportunities
-          </div>
-
-          {/* Greeting + Name */}
-          <div style={{ animation: 'fadeUp 0.8s 0.08s ease both', opacity: 0, animationFillMode: 'forwards' }}>
-            <p className="text-slate-400 text-sm tracking-widest uppercase mb-2">Hi, I'm</p>
-            <h1
-              className="font-syne font-extrabold leading-[1.03] text-gradient glow-text mb-4"
-              style={{ fontSize: 'clamp(2.6rem, 6.5vw, 5.2rem)' }}
+      <div className="hero-stage" aria-hidden="true">
+        <ChipPoster hidden={ready} />
+        {load && (
+          <div className="hero-canvas" data-ready={ready ? 'true' : 'false'}>
+            <ErrorBoundary
+              fallback={null}
+              onError={() => {
+                setLoad(false)
+                setReady(false)
+              }}
             >
-              Rohit Kamble
-            </h1>
+              <Suspense fallback={null}>
+                <HeroScene tier={tier} active={visible && docVisible} heroEl={heroRef.current} onReady={() => setReady(true)} />
+              </Suspense>
+            </ErrorBoundary>
           </div>
-
-          {/* Typed role */}
-          <div
-            className="mb-6 text-base md:text-xl text-slate-400"
-            style={{ animation: 'fadeUp 0.8s 0.16s ease both', opacity: 0, animationFillMode: 'forwards' }}
-          >
-            <span className="text-white font-medium">{typed}</span>
-            <span className="typed-cursor text-cyan-400 ml-0.5">|</span>
-          </div>
-
-          {/* Short bio */}
-          <div style={{ animation: 'fadeUp 0.8s 0.22s ease both', opacity: 0, animationFillMode: 'forwards' }}>
-     <p className="text-slate-400 text-sm leading-relaxed mb-7 max-w-md">
-  Passionate <span className="text-violet-300 font-medium">Full-Stack Software Developer</span> building scalable web applications, AI-powered solutions, and cloud-native systems. Currently a <span className="text-cyan-300 font-medium">Software Development Intern at Zonova Creative Agency</span>, <span className="text-yellow-300 font-medium">6× Hackathon Winner</span>, <span className="text-pink-300 font-medium">Top-6 Finalist at Hack for Impact (IIIT Delhi)</span>, and <span className="text-emerald-300 font-medium">IEEE Vice-Chairperson</span>.
-</p>
-          </div>
-
-          {/* CTA Buttons */}
-          <div
-            className="flex flex-wrap items-center gap-3 mb-7"
-            style={{ animation: 'fadeUp 0.8s 0.28s ease both', opacity: 0, animationFillMode: 'forwards' }}
-          >
-            <a
-              href={"/Rohit_Kamble_Resume.pdf"}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold text-sm hover:opacity-90 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-violet-900/40"
-            >
-              <DownloadIcon />
-              Download Resume
-            </a>
-            <a
-              href="#projects"
-              onClick={e => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) }}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl border border-violet-500/50 text-violet-300 font-semibold text-sm hover:bg-violet-500/10 hover:border-violet-400 hover:-translate-y-1 transition-all duration-300"
-            >
-              <GridIcon />
-              View Projects
-            </a>
-          </div>
-
-          {/* Social Links */}
-          <div
-            className="flex items-center gap-3 mb-8"
-            style={{ animation: 'fadeUp 0.8s 0.34s ease both', opacity: 0, animationFillMode: 'forwards' }}
-          >
-            {[
-              { href: personalInfo.github, icon: <GithubIcon />, label: 'GitHub' },
-              { href: personalInfo.linkedin, icon: <LinkedinIcon />, label: 'LinkedIn' },
-              { href: `mailto:${personalInfo.email}`, icon: <EmailIcon />, label: 'Email' },
-            ].map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                target={s.href.startsWith('mailto') ? undefined : '_blank'}
-                rel="noreferrer"
-                aria-label={s.label}
-                className="w-11 h-11 flex items-center justify-center rounded-xl border border-white/10 text-slate-400 hover:text-cyan-400 hover:border-cyan-400 hover:bg-cyan-400/08 hover:-translate-y-1 transition-all duration-300"
-                style={{ '--hover-bg': 'rgba(6,182,212,0.08)' }}
-              >
-                {s.icon}
-              </a>
-            ))}
-          </div>
-
-          {/* Tech pills */}
-          <div
-            className="flex flex-wrap gap-2"
-            style={{ animation: 'fadeUp 0.8s 0.4s ease both', opacity: 0, animationFillMode: 'forwards' }}
-          >
-            {techStack.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1 rounded-full border border-white/08 text-slate-500 text-[11px] font-mono bg-white/02 hover:border-cyan-500 hover:text-cyan-400 transition-all duration-300 cursor-default"
-                style={{ borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.02)' }}
-              >
-                {tech}
+        )}
+        <div ref={chipsRef} className="absolute inset-0">
+          {FLOATING.map((c) => (
+            <div key={c.label} className={`float-chip ${c.pos} max-lg:hidden`} style={{ '--depth': c.depth }}>
+              <span className="bob inline-flex items-center gap-2" style={{ '--bob': c.bob }}>
+                <i style={{ background: `${c.color}1f`, border: `1px solid ${c.color}40` }}>
+                  <Glyph type={c.glyph} color={c.color} />
+                </i>
+                {c.label}
               </span>
-            ))}
-          </div>
-        </div>
-
-        {/* RIGHT — Profile image */}
-        <div className="flex justify-center lg:justify-end">
-          <ProfileImage />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500 text-[10px] uppercase tracking-widest"
-        style={{ animation: 'fadeUp 1s 0.9s ease both', opacity: 0, animationFillMode: 'forwards' }}
-      >
-        <span>Scroll</span>
-        <div
-          className="w-px bg-gradient-to-b from-cyan-400 to-transparent"
-          style={{ height: '40px', animation: 'scrollPulse 2s ease-in-out infinite' }}
-        />
+      <div className="hero-scrim" aria-hidden="true" />
+      <div className="hero-fade" aria-hidden="true" />
+
+      <div className="container-x relative w-full pb-28 pt-[calc(var(--nav-h)+34svh)] sm:pb-32 lg:pb-24 lg:pt-[calc(var(--nav-h)+24px)]">
+        <div className="max-w-[640px] lg:max-w-[min(760px,58vw)]">
+          <a
+            href="#contact"
+            className="hero-fade-in glass inline-flex max-w-full items-center gap-2.5 rounded-full py-1.5 pl-3 pr-4 text-[13px] text-fg-2 transition-colors hover:text-white"
+            style={{ '--d': '40ms' }}
+          >
+            <span className="pulse-dot shrink-0" aria-hidden="true" />
+            <span className="truncate">
+              <span className="text-white/90">Open to full-time roles</span>
+            </span>
+            <span className="hidden h-3.5 w-px bg-white/15 sm:block" aria-hidden="true" />
+            <span className="hidden sm:inline">B.Tech EE · Class of 2026</span>
+          </a>
+
+          <h1 id="hero-title" className="mt-7">
+            <span className="hero-fade-in block text-[clamp(1.05rem,0.95rem+0.5vw,1.3rem)] font-medium tracking-tight text-fg-2" style={{ '--d': '80ms' }}>
+              Hi, I&apos;m <span className="text-white">{profile.name}</span>
+            </span>
+            <span className="hero-title mt-4 block">
+              <span className="block">{LINE_ONE.map(word)}</span>
+              <span className="block">{LINE_TWO.map(word)}</span>
+            </span>
+          </h1>
+
+          <p
+            className="hero-fade-in mt-7 flex flex-col gap-y-1.5 font-mono text-[12px] uppercase tracking-[0.14em] text-[#b6bdd0] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:text-[12.5px]"
+            style={{ '--d': '360ms' }}
+          >
+            {profile.roles.map((r, i) => (
+              <span key={r} className="inline-flex items-center gap-2.5 sm:gap-3">
+                {i > 0 && <span className="hidden h-3 w-px bg-white/20 sm:block" aria-hidden="true" />}
+                <span className="h-1 w-1 rounded-full bg-brand-blue sm:hidden" aria-hidden="true" />
+                {r}
+              </span>
+            ))}
+          </p>
+
+          <p className="lead mt-5 max-w-[34rem]">{profile.intro}</p>
+
+          <div className="hero-fade-in mt-9 flex flex-wrap items-center gap-3" style={{ '--d': '420ms' }}>
+            <a href="#projects" className="btn btn-primary max-sm:w-full">
+              Explore My Work
+              <Icon name="arrowRight" size={17} />
+            </a>
+            <a href={profile.resume} download={profile.resumeFileName} className="btn btn-secondary max-sm:flex-1">
+              <Icon name="download" size={17} />
+              <span className="sm:hidden">Resume</span>
+              <span className="max-sm:hidden">Download Resume</span>
+            </a>
+            <a href="#contact" className="btn btn-ghost max-sm:flex-1">
+              Let&apos;s Connect
+              <Icon name="arrowRight" size={17} className="btn-arrow" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-x pointer-events-none absolute inset-x-0 bottom-7 flex items-end justify-between">
+        <a
+          href="#about"
+          className="hero-fade-in pointer-events-auto flex items-center gap-3 text-[12px] font-mono uppercase tracking-[0.16em] text-fg-3 transition-colors hover:text-white"
+          style={{ '--d': '900ms' }}
+        >
+          <span className="scroll-cue" aria-hidden="true" />
+          <span className="max-sm:hidden">Scroll to explore</span>
+          <span className="sr-only sm:hidden">Scroll to About</span>
+        </a>
+        <div className="hero-fade-in pointer-events-auto flex gap-2" style={{ '--d': '950ms' }}>
+          <a className="icon-btn" href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+            <Icon name="github" size={17} />
+          </a>
+          <a className="icon-btn" href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+            <Icon name="linkedin" size={16} />
+          </a>
+          <a className="icon-btn" href={`mailto:${profile.email}`} aria-label="Email Rohit">
+            <Icon name="mail" size={17} />
+          </a>
+        </div>
       </div>
     </section>
   )

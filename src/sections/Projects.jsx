@@ -1,216 +1,267 @@
-import { useState, useRef } from 'react'
-import SectionHeader from '../components/SectionHeader'
-import { useScrollReveal } from '../hooks/useScrollReveal'
-import { projects } from '../utils/data'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
+import { CATEGORIES, STATUS, featuredProjects, moreProjects } from '../data/projects.js'
+import { spot, useInView, useTilt } from '../lib/hooks.js'
+import { Picture, Reveal, SectionHeader, StatusBadge } from '../components/ui.jsx'
+import ProjectArt, { ACCENTS } from '../components/ProjectArt.jsx'
+import Icon from '../components/Icon.jsx'
 
-const colorMap = {
-  purple: {
-    badge: 'bg-[rgba(124,58,237,0.2)] border-[rgba(124,58,237,0.5)] text-violet-300',
-    tag: 'text-violet-400',
-    hover: 'group-hover:border-violet-500/50 group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(124,58,237,0.15)]',
-  },
-  cyan: {
-    badge: 'bg-[rgba(6,182,212,0.2)] border-[rgba(6,182,212,0.5)] text-cyan-300',
-    tag: 'text-cyan-400',
-    hover: 'group-hover:border-cyan-500/50 group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(6,182,212,0.15)]',
-  },
-  pink: {
-    badge: 'bg-[rgba(236,72,153,0.2)] border-[rgba(236,72,153,0.5)] text-pink-300',
-    tag: 'text-pink-400',
-    hover: 'group-hover:border-pink-500/50 group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(236,72,153,0.15)]',
-  },
-  gold: {
-    badge: 'bg-[rgba(251,191,36,0.2)] border-[rgba(251,191,36,0.5)] text-yellow-300',
-    tag: 'text-yellow-400',
-    hover: 'group-hover:border-yellow-500/50 group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.5),0_0_0_1px_rgba(251,191,36,0.15)]',
-  },
-}
+const ProjectModal = lazy(() => import('../components/ProjectModal.jsx'))
+const preloadModal = () => import('../components/ProjectModal.jsx')
+const KNOWN_SLUGS = new Set([...featuredProjects, ...moreProjects].map((p) => p.slug))
 
-const GithubIcon = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.82.57C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
-  </svg>
-)
-
-const ExternalIcon = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-    <polyline points="15 3 21 3 21 9"/>
-    <line x1="10" y1="14" x2="21" y2="3"/>
-  </svg>
-)
-
-const FILTERS = [
-  { label: 'All Projects', value: 'all' },
-  { label: 'Full Stack', value: 'fullstack' },
-  { label: 'AI / ML', value: 'ai' },
-  { label: 'IoT', value: 'iot' },
-]
-
-function ProjectCard({ project, index }) {
-  const { ref, isVisible } = useScrollReveal()
-  const cardRef = useRef(null)
-  const c = colorMap[project.color] || colorMap.purple
-
-  // 3D tilt on mouse move
-  const handleMouseMove = (e) => {
-    const card = cardRef.current
-    if (!card) return
-    const rect = card.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const cx = rect.width / 2, cy = rect.height / 2
-    const rx = ((y - cy) / cy) * 5
-    const ry = (-(x - cx) / cx) * 5
-    card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`
-  }
-  const handleMouseLeave = () => {
-    if (cardRef.current) cardRef.current.style.transform = ''
-  }
-
+function LazyArt({ project }) {
+  const [ref, inView] = useInView({ rootMargin: '300px 0px' })
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-      style={{ transitionDelay: `${index * 100}ms` }}
-    >
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className={`group glass-card rounded-2xl overflow-hidden tilt-card ${c.hover} border transition-all duration-300 h-full flex flex-col`}
-      >
-        {/* Image area */}
-        <div className="relative h-44 bg-[#141428] overflow-hidden">
-          <div className={`absolute inset-0 flex items-center justify-center text-6xl bg-gradient-to-br from-[rgba(124,58,237,0.12)] to-[rgba(6,182,212,0.06)] group-hover:scale-105 transition-transform duration-500`}>
-            {project.emoji}
-          </div>
-
-          {/* Featured badge */}
-          {project.featured && (
-            <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 text-black text-[10px] font-bold uppercase tracking-wider shadow-lg">
-              ⭐ Featured
-            </div>
-          )}
-
-          {/* Category badge */}
-          <div className={`absolute top-3 right-3 px-2 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${c.badge}`}>
-            {project.categoryLabel}
-          </div>
-
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] to-transparent opacity-60" />
-        </div>
-
-        {/* Body */}
-        <div className="p-6 flex flex-col flex-1">
-          <h3 className="font-syne font-bold text-white text-lg mb-2 leading-snug group-hover:text-violet-200 transition-colors duration-300">
-            {project.title}
-          </h3>
-          <p className="text-slate-400 text-sm leading-relaxed mb-4 flex-1">{project.description}</p>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mb-5">
-            {project.tags.map(tag => (
-              <span key={tag} className="px-2 py-0.5 rounded text-[11px] font-mono bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.07)] text-slate-400">
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Links */}
-          <div className="flex gap-2">
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-slate-300 hover:text-white hover:bg-[rgba(255,255,255,0.1)] hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <GithubIcon />
-                GitHub
-              </a>
-            )}
-            {project.live && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <ExternalIcon />
-                Live Demo
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
+    <div ref={ref} className="h-full w-full" role="img" aria-label={`Illustration of ${project.title}`}>
+      {inView && <ProjectArt variant={project.art} accent={project.accent} className="h-full w-full" />}
     </div>
   )
 }
 
-export default function Projects() {
-  const [active, setActive] = useState('all')
+function Media({ project, sizes, eager = false }) {
+  const key = project.images?.[0]
+  if (key) {
+    return <Picture k={key} alt={`Screenshot of ${project.title}`} sizes={sizes} loading={eager ? 'eager' : 'lazy'} imgClassName="h-full w-full object-cover" />
+  }
+  return <LazyArt project={project} />
+}
 
-  const filtered = active === 'all' ? projects : projects.filter(p => p.category === active)
+function ProjectLinks({ project, compact = false }) {
+  const { live, github } = project.links
+  return (
+    <>
+      {live && (
+        <a
+          href={live}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={compact ? 'icon-btn above-stretch' : 'btn btn-secondary btn-sm above-stretch'}
+          aria-label={`${project.shortTitle || project.title}: ${project.liveLabel || 'live demo'} (opens in a new tab)`}
+        >
+          <Icon name="arrowUpRight" size={16} />
+          {!compact && (project.liveLabel || 'Live')}
+        </a>
+      )}
+      {github && (
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={compact ? 'icon-btn above-stretch' : 'btn btn-secondary btn-sm above-stretch'}
+          aria-label={`${project.shortTitle || project.title} source code on GitHub (opens in a new tab)`}
+        >
+          <Icon name="github" size={15} />
+          {!compact && 'GitHub'}
+        </a>
+      )}
+    </>
+  )
+}
+
+function ProjectCard({ project, onOpen }) {
+  const tilt = useTilt({ max: 4.5 })
+  const accent = ACCENTS[project.accent] || ACCENTS.blue
+  const name = project.shortTitle || project.title
+  return (
+    <li className="h-full" style={{ viewTransitionName: `p-${project.slug}` }}>
+      <article {...tilt} className="tilt card spotlight project-card" aria-labelledby={`pc-${project.slug}`}>
+        <div className="project-media">
+          <Media project={project} sizes="(min-width: 1280px) 384px, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, 92vw" />
+          <div className="absolute left-3 top-3 z-[1]">
+            <StatusBadge status={project.status} />
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col p-5 sm:p-6">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em]" style={{ color: accent }}>
+            {project.categoryLabel}
+          </p>
+          <h3 id={`pc-${project.slug}`} className="mt-2 text-[1.16rem] font-semibold leading-snug tracking-tight text-white">
+            {name}
+          </h3>
+          <p className="mt-2 line-clamp-3 text-[14.5px] leading-relaxed text-fg-2">{project.summary}</p>
+          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Tech stack">
+            {project.stack.slice(0, 4).map((t) => (
+              <li key={t} className="chip chip-mono">
+                {t}
+              </li>
+            ))}
+            {project.stack.length > 4 && <li className="chip chip-mono text-fg-3">+{project.stack.length - 4}</li>}
+          </ul>
+          <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
+            <button
+              type="button"
+              className="stretched btn btn-primary btn-sm mr-auto"
+              onClick={() => onOpen(project.slug)}
+              onPointerEnter={preloadModal}
+              onFocus={preloadModal}
+              aria-label={`View project details: ${name}`}
+            >
+              View Project
+              <Icon name="arrowRight" size={15} />
+            </button>
+            <ProjectLinks project={project} compact />
+          </div>
+        </div>
+      </article>
+    </li>
+  )
+}
+
+function MoreRow({ project, onOpen }) {
+  const name = project.shortTitle || project.title
+  return (
+    <li className="card spotlight relative flex items-center gap-4 p-4 sm:p-5" onPointerMove={spot}>
+      <div className="relative aspect-[16/10] w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 sm:w-32">
+        <Media project={project} sizes="128px" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h4 className="text-[15.5px] font-semibold tracking-tight text-white">{name}</h4>
+          <StatusBadge status={project.status} />
+        </div>
+        <p className="mt-1 line-clamp-2 text-[14px] leading-relaxed text-fg-2">{project.summary}</p>
+        <p className="mt-1.5 truncate font-mono text-[11px] text-fg-3">{project.stack.slice(0, 4).join(' · ')}</p>
+      </div>
+      <div className="flex shrink-0 items-center gap-2 max-sm:hidden">
+        <ProjectLinks project={project} compact />
+      </div>
+      <button type="button" className="stretched sr-only" onClick={() => onOpen(project.slug)} onFocus={preloadModal}>
+        View project details: {name}
+      </button>
+    </li>
+  )
+}
+
+export default function Projects() {
+  const [filter, setFilter] = useState('all')
+  const [openSlug, setOpenSlug] = useState(null)
+  const [modalMounted, setModalMounted] = useState(false)
+  const lastFocus = useRef(null)
+  const openRef = useRef(null)
+
+  const featured = useMemo(() => (filter === 'all' ? featuredProjects : featuredProjects.filter((p) => p.category === filter)), [filter])
+  const more = useMemo(() => (filter === 'all' ? moreProjects : moreProjects.filter((p) => p.category === filter)), [filter])
+  const order = useMemo(() => [...featured, ...more].map((p) => p.slug), [featured, more])
+  const counts = useMemo(() => {
+    const all = [...featuredProjects, ...moreProjects]
+    return Object.fromEntries(CATEGORIES.map((c) => [c.id, c.id === 'all' ? all.length : all.filter((p) => p.category === c.id).length]))
+  }, [])
+
+  const open = useCallback((slug) => {
+    if (!KNOWN_SLUGS.has(slug)) return // ignore stale or mistyped deep links
+    if (!openRef.current) lastFocus.current = document.activeElement
+    openRef.current = slug
+    setModalMounted(true)
+    setOpenSlug(slug)
+    history.replaceState(null, '', `#project-${slug}`)
+  }, [])
+
+  const close = useCallback(() => {
+    openRef.current = null
+    setOpenSlug(null)
+    history.replaceState(null, '', '#projects')
+    requestAnimationFrame(() => lastFocus.current?.focus?.({ preventScroll: true }))
+  }, [])
+
+  // Deep links (#project-<slug>) and requests from other sections (skill chips).
+  useEffect(() => {
+    const fromHash = () => {
+      const m = location.hash.match(/^#project-([\w-]+)$/)
+      if (m) open(m[1])
+    }
+    fromHash()
+    const onRequest = (e) => open(e.detail)
+    window.addEventListener('project:open', onRequest)
+    window.addEventListener('hashchange', fromHash)
+    return () => {
+      window.removeEventListener('project:open', onRequest)
+      window.removeEventListener('hashchange', fromHash)
+    }
+  }, [open])
+
+  const changeFilter = (id) => {
+    if (id === filter) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (document.startViewTransition && !reduce) document.startViewTransition(() => flushSync(() => setFilter(id)))
+    else setFilter(id)
+  }
 
   return (
-    <div
-      id="projects"
-      className="py-24"
-      style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #0f0f1a 60%, #0a0a0f 100%)' }}
-    >
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="projects" className="section" aria-labelledby="projects-title">
+      <div aria-hidden="true" className="section-glow left-[30%] top-[6%] h-[380px] w-[600px] bg-[#3b4fd8]/20" />
+      <div className="container-x relative">
         <SectionHeader
-          label="Featured projects"
-          title="What I've Built"
-          subtitle="Real-world applications solving real problems — from AI safety systems to full-stack trading platforms."
+          id="projects-title"
+          eyebrow="Featured projects"
+          title={
+            <>
+              Things I&apos;ve built, <span className="text-gradient">and am building.</span>
+            </>
+          }
+          lead="From a live legal-tech platform and an SCADA analytics suite to ESP32 robots and computer vision. Each card is labelled honestly: live, completed, in progress, prototype or concept."
         />
 
-        {/* Filter bar */}
-        <div className="flex flex-wrap gap-2 mb-10">
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setActive(f.value)}
-              className={`filter-btn px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-300 ${
-                active === f.value
-                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 border-transparent text-white shadow-lg shadow-violet-900/30'
-                  : 'border-[rgba(255,255,255,0.1)] text-slate-400 hover:border-violet-500 hover:text-violet-300 bg-transparent'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        <Reveal className="mb-10 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto px-1 pb-1" role="group" aria-label="Filter projects by category">
+            {CATEGORIES.map((c) => (
+              <button key={c.id} type="button" className="filter-tab" aria-pressed={filter === c.id} onClick={() => changeFilter(c.id)}>
+                {c.label}
+                <sup>{counts[c.id]}</sup>
+              </button>
+            ))}
+          </div>
+          <ul className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Status legend">
+            {Object.entries(STATUS).map(([key, s]) => (
+              <li key={key} className="flex items-center gap-2 text-[12.5px] text-fg-3" title={s.hint}>
+                <span className="status !px-0 !py-0 !border-0 !bg-transparent" data-tone={s.tone} aria-hidden="true" />
+                {s.label}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} />
+        <p className="sr-only" aria-live="polite">
+          {`Showing ${featured.length + more.length} projects${filter === 'all' ? '' : ` in ${CATEGORIES.find((c) => c.id === filter)?.label}`}`}
+        </p>
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((p) => (
+            <ProjectCard key={p.slug} project={p} onOpen={open} />
           ))}
-        </div>
+        </ul>
+        {featured.length === 0 && <p className="text-fg-2">No featured projects in this category yet.</p>}
 
-        {filtered.length === 0 && (
-          <div className="text-center py-20 text-slate-500">
-            <div className="text-4xl mb-4">🔍</div>
-            <p>No projects in this category yet. Check back soon!</p>
+        {more.length > 0 && (
+          <div className="mt-20">
+            <Reveal className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <h3 className="text-[1.35rem] font-semibold tracking-tight text-white">More projects</h3>
+                <p className="mt-1 text-[15px] text-fg-2">Earlier builds and experiments from Portfolio V2 and GitHub.</p>
+              </div>
+              <a
+                href="https://github.com/rohit-kamble-official?tab=repositories"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost btn-sm shrink-0 max-sm:hidden"
+              >
+                All repositories
+                <Icon name="arrowUpRight" size={15} className="btn-arrow" />
+              </a>
+            </Reveal>
+            <ul className="grid gap-3 lg:grid-cols-2">
+              {more.map((p) => (
+                <MoreRow key={p.slug} project={p} onOpen={open} />
+              ))}
+            </ul>
           </div>
         )}
-
-        {/* CTA */}
-        <div className="mt-12 text-center">
-          <a
-            href="https://github.com/rohit-kamble-official"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[rgba(124,58,237,0.4)] text-violet-300 text-sm font-semibold hover:bg-[rgba(124,58,237,0.08)] hover:border-violet-400 hover:-translate-y-0.5 transition-all duration-300"
-          >
-            <GithubIcon size={16} />
-            View All on GitHub
-          </a>
-        </div>
       </div>
-    </div>
+
+      {modalMounted && (
+        <Suspense fallback={null}>
+          <ProjectModal slug={openSlug} order={order} onClose={close} onNavigate={(slug) => open(slug)} />
+        </Suspense>
+      )}
+    </section>
   )
 }
