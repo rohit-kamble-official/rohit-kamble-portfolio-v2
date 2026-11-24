@@ -1,30 +1,31 @@
-# Rohit Kamble: Portfolio V3
+# Rohit Kamble: Portfolio V4 (Volume 01)
 
-A fast, interactive 3D developer portfolio for **Rohit Kamble**: Full Stack Developer, AI/ML enthusiast and Robotics & IoT engineer (B.Tech Electrical Engineering, 2026).
+A developer portfolio for **Rohit Kamble**: Full Stack Developer, AI/ML enthusiast and Robotics & IoT engineer (B.Tech Electrical Engineering, 2026).
 
-V3 grows out of [Portfolio V2](https://rohit-kamble-portfolio-v2.vercel.app). All V2 content is kept, restructured and updated from the latest resume.
+V4 is designed like a printed book: paper and ink, heavy condensed headlines, one accent colour, and every section is a numbered chapter. All content comes from the resume and earlier versions of the portfolio.
 
 ## Highlights
 
-- **WebGL hero (React Three Fiber + GSAP):** a floating microchip whose circuit traces fire data pulses outward. It has cursor-reactive lighting, a particle field, orbit rings and a scroll-driven camera.
-- **Loads only when useful:** the 3D chunk is lazy-loaded after the first interaction or after idle, and only on desktops and tablets. Phones, reduced-motion users and devices without WebGL get a CSS-3D version of the same chip.
-- **Interactive skill map:** a CSS-3D "tech globe" with category tabs. Each skill links to the projects and roles that actually used it, with no made-up percentages.
-- **Project cards with 3D tilt** and an animated detail view: screenshot gallery, features, metrics, tech stack, architecture flow, prev/next and deep links (`#project-<slug>`).
+- **Book layout:** eight chapters (Cover, Selected Work, The Stack, The Author, Experience, The Receipts, What I Bring, Contact) with chapter numbers, Japanese chapter labels, a vertical chapter rail and an "End of volume" colophon.
+- **Ink effects:** the name on the cover inks itself in, colour screenshots are printed in greyscale until hovered, plus halftone dots, a paper grain and crossing marquee tapes.
+- **Selected Work as comic panels**, a **bookshelf** with every project as a spine, and an index list. Any project opens as its own chapter (native `<dialog>`): screenshots, features, metrics, stack, architecture, prev/next and deep links (`#project-<slug>`).
+- **Stack layers** that pile up as you scroll, each linked to the projects and roles that actually used those skills, with no made-up percentages.
+- **Receipts:** hackathon results, leadership and certifications as torn paper receipts.
 - **Honest status labels** on every project: Live, Completed, In progress, Prototype or Concept.
-- **Live GitHub activity:** profile stats, top languages, recent repositories and a contribution heatmap.
+- **Reader controls:** pick red, blue or green ink and turn motion off; both are remembered. `prefers-reduced-motion` is respected.
 - **Working contact form** (Vercel Function + Resend), with validation, a honeypot, rate limiting and an email fallback.
-- **Prerendered HTML** (React 19 `prerender`) with selective hydration of lazy sections. Content is visible and crawlable before any JavaScript runs.
+- **Prerendered HTML** (React 19 `prerender`) with selective hydration of lazy chapters. Content is visible and crawlable before any JavaScript runs. No 3D or animation libraries: effects are CSS.
 
 ## Tech stack
 
-React 19 · Vite 8 · Tailwind CSS 4 · Three.js · @react-three/fiber · GSAP (ScrollTrigger) · Framer Motion (detail view only) · Vercel Functions · sharp (image pipeline)
+React 19 · Vite 8 · Tailwind CSS 4 · Vercel Functions · sharp (image pipeline). Fonts: Anton, Archivo, Instrument Serif and JetBrains Mono, self-hosted.
 
 ## Lighthouse (production build, local)
 
 | Form factor | Performance | Accessibility | Best Practices | SEO |
 | ----------- | ----------- | ------------- | -------------- | --- |
-| Mobile      | 92          | 100           | 100            | 100 |
-| Desktop     | 92          | 100           | 100            | 100 |
+| Mobile      | 90–93       | 100           | 100            | 100 |
+| Desktop     | 100         | 100           | 100            | 100 |
 
 Measured with Lighthouse 12 against `npm run preview`. Real scores depend on the network and the device.
 
@@ -56,8 +57,9 @@ All content lives in `src/data/`. The sections read from it, so you rarely need 
 | `projects.js`          | Projects, statuses, links, features, architecture, screenshots |
 | `skills.js`            | Skill groups (each skill's usage evidence is computed from projects and roles) |
 | `credentials.js`       | Education, certifications, achievements                     |
+| `chapters.js`          | Chapter order, numbers and labels                           |
 
-**Adding a project screenshot:** drop a 16:10 image into `assets-src/projects/<name>.jpg`, run `npm run images`, then add `images: ['projects/<name>']` to the project. Projects without screenshots use an illustrated visual (`art: 'leaf' | 'car' | 'sofa' | 'bed' | 'network' | 'chart' | 'music' | 'shield' | 'heart'`).
+**Adding a project screenshot:** drop a 16:10 image into `assets-src/projects/<name>.jpg`, run `npm run images`, then add `images: ['projects/<name>']` to the project. Projects without screenshots get a generated ink cover with the project name.
 
 **Resume:** replace `public/Rohit_Kamble_Resume.pdf` and keep the same file name.
 
@@ -91,17 +93,16 @@ src/
   App.jsx                   Page composition (lazy sections + error boundaries)
   entry-server.jsx          Static prerender entry
   main.jsx                  Hydration entry
-  components/               Navbar, Footer, ProjectModal, ProjectArt, ChipPoster, Icon, UI helpers
-  sections/                 Hero, About, Skills, Experience, Projects, Credentials, GitHubActivity, Contact
-  three/HeroScene.jsx       WebGL scene (lazy chunk)
+  components/               Navbar, Footer, ProjectChapter (detail dialog), UI helpers
+  sections/                 Hero, Work, Stack, About, Experience, Receipts, Bring, Contact
   data/                     All portfolio content
-  lib/                      Hooks, circuit generator, image helpers
-  styles/index.css          Design tokens, components, animations
+  lib/                      Hooks, image helpers
+  styles/index.css          Paper & ink design tokens, components, animations
 ```
 
 ## Accessibility
 
-Semantic landmarks and headings, a skip link, visible focus states, keyboard-operable tabs, filters and dialog (with focus trap, Escape and focus return), `aria-live` feedback for the form and filters, AA colour contrast, and full `prefers-reduced-motion` support.
+Semantic landmarks and headings, a skip link, visible focus states, a native modal dialog (Escape, arrow keys for prev/next, focus return), `aria-live` feedback for the form, AA colour contrast, a motion toggle and full `prefers-reduced-motion` support.
 
 ---
 

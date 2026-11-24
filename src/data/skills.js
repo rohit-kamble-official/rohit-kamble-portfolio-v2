@@ -35,7 +35,7 @@ export const skillGroups = [
       { name: 'CSS3', match: ['HTML/CSS/JS', 'Tailwind CSS'] },
       { name: 'Tailwind CSS', match: ['Tailwind CSS'] },
       { name: 'Responsive UI', match: ['Next.js', 'React.js', 'React'] },
-      { name: 'Three.js / R3F', match: [], note: 'Powers the 3D scenes on this site' },
+      { name: 'Three.js / R3F', match: [], note: 'Built the 3D hero of my previous portfolio (V3)' },
       { name: 'React Native', match: ['React Native'] },
     ],
   },

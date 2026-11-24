@@ -1,8 +1,8 @@
 {
   "name": "rohit-kamble-portfolio",
   "private": true,
-  "version": "3.0.0",
-  "description": "Portfolio V3 of Rohit Kamble: full-stack, AI/ML, robotics and IoT engineering.",
+  "version": "4.0.0",
+  "description": "Portfolio V4 (Volume 01) of Rohit Kamble: full-stack, AI/ML, robotics and IoT engineering.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,12 +13,8 @@
     "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
-    "@react-three/fiber": "^9.8.2",
-    "framer-motion": "14.10.1",
-    "gsap": "^3.15.1",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "three": "^0.187.0"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",

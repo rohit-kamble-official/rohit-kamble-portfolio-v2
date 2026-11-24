@@ -3,7 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <script>document.documentElement.classList.add('js')</script>
+    <script>
+      ;(function (d) {
+        d.classList.add('js')
+        try {
+          var a = localStorage.getItem('rk-accent')
+          if (a === 'blue' || a === 'green') d.dataset.accent = a
+          if (localStorage.getItem('rk-motion') === 'off') d.dataset.motion = 'off'
+        } catch (e) {}
+      })(document.documentElement)
+    </script>
 
     <!-- Primary SEO -->
     <title>Rohit Kamble | Full Stack Developer | AI/ML &amp; Robotics Engineer</title>
@@ -13,8 +22,8 @@
     />
     <meta name="author" content="Rohit Kamble" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#05060a" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#e9e5db" />
+    <meta name="color-scheme" content="light" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="canonical" href="__SITE_URL__/" />
 
@@ -25,7 +34,8 @@
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Fonts (self-hosted, latin subset) -->
-    <link rel="preload" href="/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Open Graph -->
     <meta property="og:type" content="profile" />

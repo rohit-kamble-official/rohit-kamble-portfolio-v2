@@ -1,103 +1,98 @@
-import { useEffect, useRef } from 'react'
 import { experience } from '../data/experience.js'
-import { spot } from '../lib/hooks.js'
-import { Reveal, SectionHeader } from '../components/ui.jsx'
-import Icon from '../components/Icon.jsx'
+import { education } from '../data/credentials.js'
+import { profile } from '../data/profile.js'
+import { ChapterHead, Reveal } from '../components/ui.jsx'
+
+const pad = (n) => String(n).padStart(2, '0')
+
+function Job({ job, index }) {
+  return (
+    <Reveal as="li" className="grid gap-6 border-t-2 border-ink py-10 md:grid-cols-[220px_minmax(0,1fr)] md:gap-12">
+      <div>
+        <p className="mono text-ink-3">{job.period}</p>
+        <p className="mt-2 flex flex-wrap gap-2">
+          <span className="stamp stamp-line">{job.type}</span>
+        </p>
+        <p className="mt-3 text-[14px] text-ink-3">{job.location}</p>
+      </div>
+      <div>
+        <div className="flex items-baseline gap-4">
+          <span className="font-display text-[26px] leading-none text-accent">{pad(index + 1)}</span>
+          <div>
+            <h3 className="display text-[clamp(32px,4.4vw,56px)]">{job.role}</h3>
+            <p className="mono mt-2 text-ink-2">{job.company}</p>
+          </div>
+        </div>
+        <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink-2">{job.summary}</p>
+        <ul className="mt-6 grid gap-4 lg:grid-cols-2">
+          {job.highlights.map((h, i) => (
+            <li key={h} className="panel !shadow-[4px_4px_0_var(--color-ink)] p-4">
+              <p className="mono text-[10px] text-accent">Shipped {pad(i + 1)}</p>
+              <p className="mt-2 text-[15px] leading-relaxed">{h}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mono mt-5 text-[10.5px] text-ink-3">{job.tags.join(' · ')}</p>
+      </div>
+    </Reveal>
+  )
+}
 
 export default function Experience() {
-  const timeline = useRef(null)
-
-  // Fill the rail as the timeline scrolls through the viewport.
-  useEffect(() => {
-    const el = timeline.current
-    if (!el) return
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const r = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const progress = Math.min(1, Math.max(0, (vh * 0.65 - r.top) / r.height))
-      el.style.setProperty('--progress', progress.toFixed(3))
-    }
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
-  }, [])
-
   return (
-    <section id="experience" className="section" aria-labelledby="experience-title">
-      <div className="container-x relative">
-        <SectionHeader
-          id="experience-title"
-          eyebrow="Professional experience"
-          title={
-            <>
-              Learning by <span className="text-gradient">shipping real software.</span>
-            </>
-          }
-          lead="Four internships across web development, data analytics, Android and machine learning, from production client apps to predictive models."
-        />
+    <section id="experience" className="chapter" aria-labelledby="experience-title">
+      <div className="wrap">
+        <ChapterHead id="experience" titleId="experience-title" lines={['On', 'the', 'Job']} />
 
-        <div ref={timeline} className="timeline">
-          <span className="timeline-rail" aria-hidden="true" />
-          <ol className="space-y-6 lg:space-y-8">
-            {experience.map((job, i) => (
-              <Reveal as="li" key={job.id} delay={60} className="relative grid gap-4 pl-12 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-20 lg:pl-0">
-                <span className="timeline-node" data-current={job.current ? 'true' : 'false'} aria-hidden="true" />
-                <div className="lg:pt-5 lg:text-right">
-                  <p className="font-mono text-[12.5px] tracking-wide text-white/85">{job.period}</p>
-                  <p className="mt-1 text-[13px] text-fg-3">{job.location}</p>
-                  <span className={`chip mt-3 ${job.current ? 'border-[#3ee6a0]/35 text-[#8ff0c4]' : ''}`}>
-                    {job.current && <span className="pulse-dot !h-1.5 !w-1.5" aria-hidden="true" />}
-                    {job.current ? 'Current' : job.type}
-                  </span>
+        <Reveal className="mb-10 flex flex-wrap items-center justify-between gap-4 on-dark border-2 border-ink bg-ink p-5 text-paper sm:p-6">
+          <div>
+            <p className="mono text-accent">Now</p>
+            <p className="display mt-2 text-[clamp(28px,3.4vw,40px)]">Looking for my first full-time role</p>
+          </div>
+          <a href="#contact" className="btn btn-accent">
+            Get in touch →
+          </a>
+        </Reveal>
+
+        <ol className="border-b-2 border-ink">
+          {experience.map((job, i) => (
+            <Job key={job.id} job={job} index={i} />
+          ))}
+          <Reveal as="li" className="grid gap-6 border-t-2 border-ink py-10 md:grid-cols-[220px_minmax(0,1fr)] md:gap-12">
+            <div>
+              <p className="mono text-ink-3">{education.period}</p>
+              <p className="mt-2">
+                <span className="stamp stamp-ink">Education</span>
+              </p>
+              <p className="mt-3 text-[14px] text-ink-3">{education.location}</p>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-4">
+                <span className="font-display text-[26px] leading-none text-accent">{pad(experience.length + 1)}</span>
+                <div>
+                  <h3 className="display text-[clamp(32px,4.4vw,56px)]">B.Tech, Electrical Engineering</h3>
+                  <p className="mono mt-2 text-ink-2">
+                    {education.institute} · {education.minor}
+                  </p>
                 </div>
-
-                <article className="card spotlight p-6 sm:p-7" onPointerMove={spot} aria-labelledby={`job-${job.id}`}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <h3 id={`job-${job.id}`} className="text-[1.2rem] font-semibold tracking-tight text-white">
-                        {job.role}
-                      </h3>
-                      <p className="mt-1 flex items-center gap-2 text-[15px] text-fg-2">
-                        <Icon name="briefcase" size={15} className="text-brand-blue" />
-                        {job.company}
-                        {job.current && <span className="text-fg-3">· {job.type}</span>}
-                      </p>
-                    </div>
-                    <span className="font-mono text-[11px] text-fg-3" aria-hidden="true">
-                      {String(experience.length - i).padStart(2, '0')}
-                    </span>
+              </div>
+              <dl className="mt-6 grid max-w-2xl grid-cols-2 border-l-2 border-t-2 border-ink sm:grid-cols-3">
+                {[
+                  ['CGPA', `${education.cgpa} / ${education.cgpaScale}`],
+                  ['Class of', '2026'],
+                  ['Final-year project', 'Substation Sentinel'],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex flex-col-reverse gap-2 border-b-2 border-r-2 border-ink p-4">
+                    <dt className="mono text-[10px] text-ink-3">{k}</dt>
+                    <dd className="font-display text-[26px] leading-none">{v}</dd>
                   </div>
-                  <p className="mt-4 text-[15px] text-white/80">{job.summary}</p>
-                  <ul className="mt-4 space-y-2.5">
-                    {job.highlights.map((h) => (
-                      <li key={h} className="flex gap-3 text-[14.5px] leading-relaxed text-fg-2">
-                        <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-brand-blue" aria-hidden="true" />
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
-                  <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Skills used">
-                    {job.tags.map((t) => (
-                      <li key={t} className="chip chip-mono">
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </Reveal>
-            ))}
-          </ol>
-        </div>
+                ))}
+              </dl>
+              <p className="mono mt-5 text-[10.5px] leading-[1.9] text-ink-3">Coursework: {education.coursework.join(' · ')}</p>
+            </div>
+          </Reveal>
+        </ol>
+        <p className="sr-only">{profile.availability}</p>
       </div>
     </section>
   )
